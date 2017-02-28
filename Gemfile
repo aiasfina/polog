@@ -17,13 +17,15 @@ source 'https://rubygems.org'
 gem 'rake'
 
 # Component requirements
+gem 'activesupport', '>= 3.1'
+gem 'bcrypt'
 gem 'activerecord', '>= 3.1', :require => 'active_record'
 gem 'pg'
 
 # Test requirements
 
 # Padrino Stable Gem
-gem 'padrino', '0.13.3.3'
+gem 'padrino', git: 'https://github.com/padrino/padrino-framework.git'
 
 # Or Padrino Edge
 # gem 'padrino', :github => 'padrino/padrino-framework'
