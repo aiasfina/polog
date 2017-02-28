@@ -1,0 +1,81 @@
+$menu-width-desktop: 180px;
+
+$menu-bg-color: #133656;
+
+$menu-brand-bg-color: #1D98BB;
+$menu-brand-color: #fff;
+$menu-brand-size: 24px;
+
+$menu-list-link-color: #486b8b;
+$menu-list-link-color-active: #fff;
+$menu-list-link-size: 16px;
+$menu-list-link-bg-color-hover: #294e6f;;
+
+.app {
+  body {
+    margin-left: $menu-width-desktop;
+  }
+  .menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: $menu-width-desktop;
+    background-color: $menu-bg-color;
+
+    .brand {
+      text-align: center;
+      font-size: $menu-brand-size;
+      background-color: $menu-brand-bg-color;
+      padding: 40px 0;
+      margin-top: 40px;
+      a {
+        color: $menu-brand-color;
+        text-decoration: none;
+      }
+    }
+
+    ul {
+      width: 100%;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      li {
+        position: relative;
+        text-align: center;
+        a {
+          padding: 10px;
+          display: block;
+          font-size: $menu-list-link-size;
+          color: $menu-list-link-color;
+          text-decoration: none;
+          &:hover {
+            background-color: $menu-list-link-bg-color-hover;
+          }
+        }
+        i {
+          font-size: 1.5em;
+          margin-bottom: 0.5em;
+        }
+        p {
+          font-size: 12px;
+        }
+
+        &.active {
+          a {
+            color: $menu-list-link-color-active;
+          }
+          &:before {
+            content: ' ';
+            position: absolute;
+            height: 100%;
+            width: 5px;
+            top: 0;
+            left: 0;
+            background-color: #FBFF51;
+          }
+        }
+      }
+    }
+  }
+}

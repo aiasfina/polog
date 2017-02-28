@@ -1,10 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<html class="app" lang="zh-cn" xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
-    <!--[if lt IE 9]>
-    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
     <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
     <meta name=viewport content='width=device-width,initial-scale=1' />
     <title><%= @title.present? ? "#{@title} | Padrino Admin" : "Padrino Admin" %></title>
@@ -13,51 +9,33 @@
     <%= stylesheet_link_tag 'index', 'application' %>
   </head>
   <body>
-    <div class="navbar navbar-fixed-top">
-      <div class=navbar-inner>
-        <div class=container>
-          <%= link_to 'Padrino', url(:base, :index), :class => 'navbar-brand', :title => 'Padrino Admin' %>
-          <ul class="nav navbar-nav pull-right">
-            <li class=navbar-edit-account><%= link_to tag_icon(:user), url(:accounts, :edit, :id => current_account.id), :title => pat(:profile), :class => 'navbar-nav-link' %></li>
-            <li class=navbar-logout>
-              <%= button_to(:logout, url(:sessions, :destroy), :method => :delete, :class => 'navbar-nav-form', :submit_options => { :type => :submit, :title => pat(:logout), :class => 'navbar-nav-form-link' }) { tag_icon(:'power-off') } %>
-            </li>
-          </ul>
+    <div class="menu">
+      <div class="brand"><%= link_to 'Polog', url(:base, :index) %></div>
+      <ul>
+        <li>
+          <% link_to url(:accounts, :index) do %>
+            <%= content_tag(:i, '', class: 'fa fa-bars') %>
+            <%= content_tag(:p, '文章管理') %>
+          <% end %>
+        </li>
 
-          <ul class="nav navbar-nav pull-left">
-            <% project_modules.each do |project_module| %>
-              <% if request.path_info =~ /^#{project_module.path}/ %>
-                <li class="navbar-module active">
-              <% else %>
-                <li class=navbar-module>
-              <% end %>
-                <%= link_to project_module.human_name, url(project_module.path) %>
-                </li>
-            <% end %>
-          </ul>
-        </div>
-      </div>
+        <li class="<%= 'active' if request.path.start_with? url(:accounts, :index) %>">
+          <% link_to url(:accounts, :index) do %>
+            <%= content_tag(:i, '', class: 'fa fa-users') %>
+            <%= content_tag(:p, '账号管理') %>
+          <% end %>
+        </li>
+      </ul>
     </div>
 
-    <div class='container main'>
-      <div class='main-wrapper'>
-        <%= {:error => 'danger', :warning => 'warning', :success => 'success', :notice => 'info'}.map { |type, class_name| flash_tag(type, :class => "alert alert-#{class_name} fade in", :bootstrap => true) }.join.html_safe %>
-        <div class='row'><%= yield %></div>
-        <div class='main-wrapper-push'></div>
-      </div>
-    </div>
-
-    <footer>
-      <div class='footer-wrapper container'>
-        <p class='pull-left'>Copyright &copy; 2017 Your Site - Powered by Padrino v.0.14.0.rc2</p>
-        <ul class='pull-right footer-links'>
-          <li><%= link_to tag_icon(:home, 'web'), 'http://www.padrinorb.com', :target => :_blank, :class => 'footer-links-link' %></li>
-          <li><%= link_to tag_icon(:heart, 'blog'), 'http://www.padrinorb.com/blog', :target => :_blank, :class => 'footer-links-link' %></li>
-          <li><%= link_to tag_icon(:github, 'code'), 'https://github.com/padrino/padrino-framework', :target => :_blank, :class => 'footer-links-link' %></li>
-          <li><%= link_to tag_icon(:twitter, 'twitter'), 'http://twitter.com/padrinorb', :target => :_blank, :class => 'footer-links-link' %></li>
+    <main id="main">
+      <nav class="nav">
+        <ul>
+          <li><a href="#"><i class="fa fa-bars"></i></a></li>
         </ul>
-      </div>
-    </footer>
+      </nav>
+      <%= yield %>
+    </main>
 
     <%= javascript_include_tag 'index.bundle.js', 'bootstrap/bootstrap.min.js' %>
   </body>
