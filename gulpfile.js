@@ -11,11 +11,11 @@ var babelify = require('babelify');
 
 gulp.task('browserify', function() {
   var entries = [
-    'app/index.jsx'
+    'admin/javascripts/index.jsx'
   ];
 
   var tasks = entries.map(function(entry) {
-    return browserify({entries: ['./assets/javascripts/' + entry]})
+    return browserify({entries: ['./assets/' + entry]})
       .transform(babelify)
       .bundle()
       .on("error", function (err) { console.log("Error : " + err.message); })
@@ -23,30 +23,30 @@ gulp.task('browserify', function() {
       .pipe(rename({
         extname: '.bundle.js'
       }))
-      .pipe(gulp.dest('./public/javascripts/'))
+      .pipe(gulp.dest('./public/'))
   });
 });
 
 gulp.task('sass', function() {
   var entries = [
     {
-      file: 'app/index.scss',
-      dest: 'app'
+      file: 'admin/stylesheets/index.scss',
+      dest: 'admin/stylesheets'
     }
   ];
 
   entries.map(function(entry) {
-    return gulp.src('./assets/stylesheets/' + entry.file)
+    return gulp.src('./assets/' + entry.file)
               .pipe(sass().on('error', sass.logError))
               .pipe(gulp.dest(function(file) {
-                return './public/stylesheets/' + entry.dest
+                return './public/' + entry.dest
               }))
   })
 });
 
 gulp.task('watch', function() {
-  gulp.watch('./assets/javascripts/**/*.jsx', ['browserify'])
-  gulp.watch('./assets/stylesheets/**/*.scss', ['sass'])
+  gulp.watch('./assets/**/*.jsx', ['browserify'])
+  gulp.watch('./assets/**/*.scss', ['sass'])
 });
 
 gulp.task('default', ['watch']);
