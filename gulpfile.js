@@ -1,6 +1,7 @@
 // http://qiita.com/hkusu/items/e068bba0ae036b447754
 // https://fettblog.eu/gulp-browserify-multiple-bundles/
 
+var path = require('path');
 var gulp = require('gulp');
 var rename = require('gulp-rename')
 var babel = require('gulp-babel');
@@ -35,9 +36,16 @@ gulp.task('sass', function() {
     }
   ];
 
+  var includePaths = [
+    path.join(__dirname, '/node_modules/bootstrap-sass/assets/stylesheets/'),
+    path.join(__dirname, '/node_modules/font-awesome/scss/')
+  ]
+
   entries.map(function(entry) {
     return gulp.src('./assets/' + entry.file)
-              .pipe(sass().on('error', sass.logError))
+              .pipe(sass({
+                includePaths: includePaths
+              }).on('error', sass.logError))
               .pipe(gulp.dest(function(file) {
                 return './public/' + entry.dest
               }))

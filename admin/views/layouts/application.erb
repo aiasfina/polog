@@ -10,7 +10,7 @@
     <title><%= @title.present? ? "#{@title} | Padrino Admin" : "Padrino Admin" %></title>
     <%= favicon_tag "favicon.ico" %>
     <link href='http://fonts.googleapis.com/css?family=Varela' rel=stylesheet />
-    <%= stylesheet_link_tag 'bootstrap', 'application' %>
+    <%= stylesheet_link_tag 'index', 'application' %>
   </head>
   <body>
     <div class="navbar navbar-fixed-top">
@@ -59,6 +59,6 @@
       </div>
     </footer>
 
-    <%= javascript_include_tag 'jquery-1.11.0.min', (Padrino.env == :production ? 'bootstrap/bootstrap.min' : %w[bootstrap/affix bootstrap/alert bootstrap/button bootstrap/carousel bootstrap/collapse bootstrap/dropdown  bootstrap/tooltip bootstrap/transition  bootstrap/modal bootstrap/popover bootstrap/scrollspy bootstrap/tab]), :application %>
+    <%= javascript_include_tag 'index.bundle.js', 'bootstrap/bootstrap.min.js' %>
   </body>
 </html>
