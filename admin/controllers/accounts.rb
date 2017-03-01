@@ -1,8 +1,12 @@
 Polog::Admin.controllers :accounts do
-  get :index do
+  get :index, provides: [:html, :json] do
     @title = "Accounts"
     @accounts = Account.all
-    render 'accounts/index'
+
+    case content_type
+      when :html then render 'accounts/index'
+      when :json then @accounts.to_json
+    end
   end
 
   get :new do

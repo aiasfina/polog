@@ -53,7 +53,7 @@ gulp.task('sass', function() {
 });
 
 gulp.task('watch', function() {
-  gulp.watch('./assets/**/*.jsx', ['browserify'])
+  gulp.watch(['./assets/**/*.jsx', './assets/**/*.js'], ['browserify'])
   gulp.watch('./assets/**/*.scss', ['sass'])
 });
 

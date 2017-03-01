@@ -8195,6 +8195,8 @@ button.close {
         background-color: #FBFF51; }
 
 .app main#main {
+  position: relative;
+  height: 100%;
   padding-left: 40px;
   padding-right: 40px; }
   .app main#main > nav {
@@ -8212,3 +8214,15 @@ button.close {
           text-decoration: none; }
         .app main#main > nav ul li i {
           font-size: 26px; }
+
+.app #content {
+  position: relative; }
+
+.app .table-wrapper .table thead th {
+  border: none; }
+
+.app .table-wrapper .table tbody td {
+  border-top: none;
+  border-bottom: solid 1px #f3f3f3;
+  padding-top: 10px;
+  padding-bottom: 10px; }

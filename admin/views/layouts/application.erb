@@ -14,7 +14,7 @@
       <ul>
         <li>
           <% link_to url(:accounts, :index) do %>
-            <%= content_tag(:i, '', class: 'fa fa-bars') %>
+            <%= content_tag(:i, '', class: 'fa fa-list') %>
             <%= content_tag(:p, '文章管理') %>
           <% end %>
         </li>
@@ -34,9 +34,13 @@
           <li><a href="#"><i class="fa fa-bars"></i></a></li>
         </ul>
       </nav>
-      <%= yield %>
+      
+      <div id="content">
+        <%= yield %>
+      </div>
     </main>
 
     <%= javascript_include_tag 'index.bundle.js', 'bootstrap/bootstrap.min.js' %>
+    <%= yield_content :script %>
   </body>
 </html>
