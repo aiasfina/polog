@@ -34,3 +34,8 @@ gem 'padrino', git: 'https://github.com/padrino/padrino-framework.git'
 # %w(core support gen helpers cache mailer admin).each do |g|
 #   gem 'padrino-' + g, '0.13.3.3'
 # end
+
+gem 'rack-parser', :require => 'rack/parser'
+
+gem 'binding_of_caller'
+gem 'pry'

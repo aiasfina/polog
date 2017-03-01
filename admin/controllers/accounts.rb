@@ -1,11 +1,12 @@
 Polog::Admin.controllers :accounts do
   get :index, provides: [:html, :json] do
     @title = "Accounts"
-    @accounts = Account.all
 
     case content_type
       when :html then render 'accounts/index'
-      when :json then @accounts.to_json
+      when :json then
+        @accounts = Account.order(id: :desc)
+        @accounts.to_json
     end
   end
 
@@ -15,16 +16,13 @@ Polog::Admin.controllers :accounts do
     render 'accounts/new'
   end
 
-  post :create do
+  post :create, provides: :json do
     @account = Account.new(params[:account])
     if @account.save
-      @title = pat(:create_title, :model => "account #{@account.id}")
-      flash[:success] = pat(:create_success, :model => 'Account')
-      params[:save_and_continue] ? redirect(url(:accounts, :index)) : redirect(url(:accounts, :edit, :id => @account.id))
+      @account.to_json
     else
-      @title = pat(:create_title, :model => 'account')
-      flash.now[:error] = pat(:create_error, :model => 'account')
-      render 'accounts/new'
+      binding.pry
+      halt 500
     end
   end
 

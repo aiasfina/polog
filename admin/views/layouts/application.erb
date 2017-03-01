@@ -3,6 +3,8 @@
   <head>
     <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
     <meta name=viewport content='width=device-width,initial-scale=1' />
+    <%= tag(:meta, name: 'csrf-param', content: 'authenticity_token') %>
+    <%= tag(:meta, name: 'csrf-token', content: session[:csrf]) %>
     <title><%= @title.present? ? "#{@title} | Padrino Admin" : "Padrino Admin" %></title>
     <%= favicon_tag "favicon.ico" %>
     <link href='http://fonts.googleapis.com/css?family=Varela' rel=stylesheet />

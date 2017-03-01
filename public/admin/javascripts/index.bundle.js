@@ -9,17 +9,41 @@ window.initAccountIndex = function () {
   m.mount(el, tableComponent);
 };
 
-},{"./components/account_table.jsx":2,"mithril":5}],2:[function(require,module,exports){
+},{"./components/account_table.jsx":2,"mithril":7}],2:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
 var Account = require('../models/account.js');
+var ModalComponent = require('./modal.jsx');
 
-var Component = {
+var FilterComponent = {
+  newAccount: function newAccount() {
+    $('#accountModal').modal();
+  },
+  view: function view() {
+    return m(
+      'div',
+      { className: 'filters clearfix' },
+      m(
+        'a',
+        { href: '#', className: 'btn btn-default' },
+        'All'
+      ),
+      m(
+        'a',
+        { href: 'javascript:void(0);', className: 'btn btn-primary pull-right', onclick: this.newAccount },
+        m('i', { className: 'fa fa-plus' }),
+        ' \u6DFB\u52A0\u7528\u6237'
+      )
+    );
+  }
+};
+
+var TableComponent = {
   oninit: Account.loadList,
   checkedAll: false,
   selectAllAccount: function selectAllAccount(checked) {
-    Component.checkedAll = checked;
+    this.checkedAll = checked;
     if (checked) {
       Account.list.forEach(function (account) {
         Account.selectedObject[account.id] = account;
@@ -35,7 +59,7 @@ var Component = {
     return m(
       'tr',
       { className: Account.selectedObject[account.id] ? 'active' : '',
-        onclick: Component.selectAccount.bind(account) },
+        onclick: this.selectAccount.bind(account) },
       m(
         'td',
         null,
@@ -76,8 +100,8 @@ var Component = {
           m(
             'th',
             null,
-            m('input', { type: 'checkbox', onclick: m.withAttr('checked', Component.selectAllAccount),
-              checked: Component.checkedAll })
+            m('input', { type: 'checkbox', onclick: m.withAttr('checked', this.selectAllAccount.bind(this)),
+              checked: this.checkedAll })
           ),
           m(
             'th',
@@ -105,26 +129,227 @@ var Component = {
         'tbody',
         null,
         Account.list.map(function (account) {
-          return Component.renderRowView(account);
+          return TableComponent.renderRowView(account);
         })
       )
     );
   }
 };
 
-module.exports = Component;
+var FormComponent = {
+  form: {
+    name: '',
+    surname: '',
+    password: '',
+    password_confirmation: '',
+    email: '',
+    role: ''
+  },
+  errors: {},
+  updateForm: function updateForm(name) {
+    var form = this.form;
+    return function (value) {
+      form[name] = value;
+    };
+  },
+  reset: function reset() {
+    for (var key in this.form) {
+      if (this.form.hasOwnProperty(key)) {
+        this.form[key] = '';
+      }
+    }
 
-},{"../models/account.js":4,"mithril":5}],3:[function(require,module,exports){
+    for (var key in this.errors) {
+      if (this.errors.hasOwnProperty(key)) {
+        this.errors[key] = '';
+      }
+    }
+  },
+  submit: function submit(e) {
+    if (Account.valid(this.form, this.errors)) {
+      Account.create(this.form).then(function () {
+        $('#accountModal').modal('hide');
+        FormComponent.reset();
+      });
+    }
+  },
+  errorClassName: function errorClassName(name) {
+    return FormComponent.errors[name] ? ' has-error' : '';
+  },
+  errorMessage: function errorMessage(name) {
+    if (FormComponent.errors[name]) {
+      return m(
+        'p',
+        { 'class': 'text-danger text-right' },
+        FormComponent.errors[name]
+      );
+    }
+  },
+  view: function view() {
+    return m(
+      'form',
+      null,
+      m(
+        'div',
+        { className: "form-group" + this.errorClassName('name') },
+        m(
+          'label',
+          { className: 'control-label', htmlFor: 'account_name' },
+          '\u7528\u6237\u540D'
+        ),
+        m('input', { id: 'account_name', type: 'text', className: 'form-control', value: this.form.name, oninput: m.withAttr('value', this.updateForm('name')) })
+      ),
+      m(
+        'div',
+        { className: "form-group" + this.errorClassName('surname') },
+        m(
+          'label',
+          { className: 'control-label', htmlFor: 'account_surname' },
+          '\u522B\u540D'
+        ),
+        m('input', { id: 'account_surname', type: 'text', className: 'form-control', value: this.form.surname, oninput: m.withAttr('value', this.updateForm('surname')) })
+      ),
+      m(
+        'div',
+        { className: "form-group" + this.errorClassName('email') },
+        m(
+          'label',
+          { className: 'control-label', htmlFor: 'account_email' },
+          '\u90AE\u7BB1'
+        ),
+        m('input', { id: 'account_email', type: 'text', className: 'form-control', value: this.form.email, oninput: m.withAttr('value', this.updateForm('email')) }),
+        this.errorMessage('email')
+      ),
+      m(
+        'div',
+        { className: "form-group" + this.errorClassName('password') },
+        m(
+          'label',
+          { className: 'control-label', htmlFor: 'account_password' },
+          '\u5BC6\u7801'
+        ),
+        m('input', { id: 'account_password', type: 'password', className: 'form-control', value: this.form.password, oninput: m.withAttr('value', this.updateForm('password')) }),
+        this.errorMessage('password')
+      ),
+      m(
+        'div',
+        { className: "form-group" + this.errorClassName('password_confirmation') },
+        m(
+          'label',
+          { className: 'control-label', htmlFor: 'account_password_confirmation' },
+          '\u786E\u8BA4\u5BC6\u7801'
+        ),
+        m('input', { id: 'account_password_confirmation', type: 'password', className: 'form-control',
+          value: this.form.password_confirmation, oninput: m.withAttr('value', this.updateForm('password_confirmation')) }),
+        this.errorMessage('password_confirmation')
+      ),
+      m(
+        'div',
+        { className: "form-group" + this.errorClassName('role') },
+        m(
+          'label',
+          { className: 'control-label', htmlFor: 'account_role' },
+          '\u89D2\u8272'
+        ),
+        m('input', { id: 'account_role', type: 'text', className: 'form-control', value: this.form.role, oninput: m.withAttr('value', this.updateForm('role')) }),
+        this.errorMessage('role')
+      ),
+      m(
+        'div',
+        { className: 'form-group clearfix' },
+        m(
+          'button',
+          { type: 'button', 'class': 'btn btn-default', 'data-dismiss': 'modal', onclick: this.reset.bind(this) },
+          '\u5173\u95ED'
+        ),
+        m(
+          'button',
+          { type: 'button', 'class': 'btn btn-primary pull-right', onclick: this.submit.bind(this) },
+          '\u4FDD\u5B58'
+        )
+      )
+    );
+  }
+};
+
+module.exports = {
+  view: function view() {
+    return [m(FilterComponent), m(TableComponent), m(ModalComponent, { title: FormComponent.title }, m(FormComponent))];
+  }
+};
+
+},{"../models/account.js":5,"./modal.jsx":3,"mithril":7}],3:[function(require,module,exports){
+'use strict';
+
+var m = require('mithril');
+
+var ModalComponent = {
+  title: '',
+  view: function view(vnode) {
+    this.title = vnode.attrs.title || this.title;
+    return m(
+      'div',
+      { 'class': 'modal fade', id: 'accountModal', tabindex: '-1', role: 'dialog', 'aria-labelledby': 'accountModalLabel' },
+      m(
+        'div',
+        { 'class': 'modal-dialog', role: 'document' },
+        m(
+          'div',
+          { 'class': 'modal-content' },
+          m(
+            'div',
+            { 'class': 'modal-body' },
+            vnode.children
+          )
+        )
+      )
+    );
+  }
+};
+
+module.exports = ModalComponent;
+
+},{"mithril":7}],4:[function(require,module,exports){
 'use strict';
 
 window.jQuery = window.$ = require('jquery');
 
 require('./accounts.js');
 
-},{"./accounts.js":1,"jquery":6}],4:[function(require,module,exports){
+},{"./accounts.js":1,"jquery":8}],5:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
+var utils = require('../utils.js');
+
+var validations = {
+  email: {
+    pattern: function pattern(value) {
+      return (/([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})/.test(value)
+      );
+    },
+    message: '邮箱格式不合法'
+  },
+  role: {
+    pattern: function pattern(value) {
+      return (/[A-Za-z]/.test(value)
+      );
+    },
+    message: '角色只允许英文字母'
+  },
+  password: {
+    pattern: function pattern(value) {
+      return value.length > 4;
+    },
+    message: '密码长度必须大于4'
+  },
+  password_confirmation: {
+    pattern: function pattern(value) {
+      return value === this.password;
+    },
+    message: '两次输入密码不同'
+  }
+};
 
 var Account = {
   list: [],
@@ -137,12 +362,61 @@ var Account = {
       Account.list = data;
     });
   },
+  create: function create(form) {
+    return m.request({
+      method: 'POST',
+      url: '/admin/accounts/create',
+      data: { account: form },
+      withCredentials: true,
+      config: utils.xhrConfig
+    }).then(function (resp) {
+      Account.list.unshift(resp);
+    });
+  },
+  valid: function valid(form, errors) {
+    var validation,
+        flag = true;
+
+    for (var key in form) {
+      validation = validations[key];
+      if (validation) {
+        if (!validation.pattern.call(form, form[key])) {
+          errors[key] = validation.message;
+          flag = false;
+        } else {
+          errors[key] = null;
+        }
+      }
+    }
+
+    return flag;
+  },
   selectedObject: {}
 };
 
 module.exports = Account;
 
-},{"mithril":5}],5:[function(require,module,exports){
+},{"../utils.js":6,"mithril":7}],6:[function(require,module,exports){
+"use strict";
+
+var $ = require('jquery');
+
+var utils = {};
+
+utils.getCSRFToken = function () {
+  var param = $("[name=csrf-param]").attr("content");
+  var token = $("[name=csrf-token]").attr("content");
+
+  return [param, token];
+};
+
+utils.xhrConfig = function (xhr) {
+  xhr.setRequestHeader('X-CSRF-Token', utils.getCSRFToken()[1]);
+};
+
+module.exports = utils;
+
+},{"jquery":8}],7:[function(require,module,exports){
 (function (global){
 new function() {
 
@@ -1308,7 +1582,7 @@ if (typeof module !== "undefined") module["exports"] = m
 else window.m = m
 }
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.1.1
  * https://jquery.com/
@@ -11530,4 +11804,4 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}]},{},[3]);
+},{}]},{},[4]);

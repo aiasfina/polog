@@ -39,9 +39,36 @@ module Polog
       role.project_module :accounts, '/accounts'
     end
 
-    # Custom error management 
-    error(403) { @title = "Error 403"; render('errors/403', :layout => :error) }
-    error(404) { @title = "Error 404"; render('errors/404', :layout => :error) }
-    error(500) { @title = "Error 500"; render('errors/500', :layout => :error) }
+    use Rack::Parser, :content_types => {
+      'application/json'  => Proc.new { |body| ::MultiJson.decode body }
+    }
+    
+    # # Custom error management 
+    error(403) do
+      if content_type == :json
+        {status_code: response.status}.to_json
+      else
+        @title = "Error 403"
+        render('errors/403', :layout => :error)
+      end
+    end
+
+    error(404) do
+      if content_type == :json
+        {status_code: response.status}.to_json
+      else
+        @title = "Error 404"
+        render('errors/404', :layout => :error)
+      end
+    end
+
+    error(500) do
+      if content_type == :json
+        {status_code: response.status}.to_json
+      else
+        @title = "Error 500"
+        render('errors/500', :layout => :error)
+      end
+    end
   end
 end

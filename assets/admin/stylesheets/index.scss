@@ -1,9 +1,11 @@
 $icon-font-path: '/admin/stylesheets/fonts/';
 $fa-font-path: './fonts';
 
-@import 'bootstrap';
-@import 'font-awesome';
-
+@import './misc';
 @import './menu';
 @import './main';
 @import './table';
+@import './button';
+
+@import 'bootstrap';
+@import 'font-awesome';
