@@ -23,6 +23,7 @@ Polog::Admin.controllers :posts do
 
   post :create, provides: :json do
     @post = current_account.posts.build params[:post]
+    @post.content_html = @post.markdown_convert
     if @post.save
       Rabl::Renderer.json(@post, 'posts/show', view_path: 'admin/views')
     else
@@ -37,7 +38,9 @@ Polog::Admin.controllers :posts do
   put :update, with: :id, provides: :json do
     @post = current_account.posts.find(params[:id])
     if @post
-      if @post.update_attributes params[:post]
+      @post.attributes = params[:post]
+      @post.content_html = @post.markdown_convert
+      if @post.save
         Rabl::Renderer.json(@post, 'posts/show', view_path: 'admin/views')
       else
         halt 500

@@ -41,3 +41,5 @@ gem 'binding_of_caller'
 gem 'pry'
 
 gem 'rabl'
+
+gem 'kramdown'
