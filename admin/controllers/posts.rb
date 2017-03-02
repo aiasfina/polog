@@ -4,7 +4,7 @@ Polog::Admin.controllers :posts do
     case content_type
       when :html then render 'posts/index'
       when :json then
-        @posts = Post.order(id: :desc)
+        @posts = Post.select(:id, :title, :published_at).order(id: :desc)
         @posts.to_json
     end
   end

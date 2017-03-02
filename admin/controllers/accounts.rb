@@ -5,7 +5,7 @@ Polog::Admin.controllers :accounts do
     case content_type
       when :html then render 'accounts/index'
       when :json then
-        @accounts = Account.order(id: :desc)
+        @accounts = Account.select(:id, :name, :surname, :email, :role).order(id: :desc)
         @accounts.to_json
     end
   end
