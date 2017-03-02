@@ -18,6 +18,7 @@ var ModalComponent = require('./modal.jsx');
 
 var FilterComponent = {
   newAccount: function newAccount() {
+    FormComponent.reset();
     $('#accountModal').modal();
   },
   view: function view() {
@@ -55,6 +56,15 @@ var TableComponent = {
   selectAccount: function selectAccount() {
     Account.selectedObject[this.id] = Account.selectedObject[this.id] ? null : this;
   },
+  edit: function edit(account) {
+    return function () {
+      FormComponent.reset();
+      ['id', 'name', 'surname', 'email', 'role'].forEach(function (name) {
+        FormComponent.form[name] = account[name];
+      });
+      $('#accountModal').modal();
+    };
+  },
   renderRowView: function renderRowView(account) {
     return m(
       'tr',
@@ -84,6 +94,15 @@ var TableComponent = {
         'td',
         null,
         account.role
+      ),
+      m(
+        'td',
+        null,
+        m(
+          'a',
+          { href: 'javascript:void(0);', onclick: this.edit(account) },
+          m('i', { className: 'fa fa-edit' })
+        )
       )
     );
   },
@@ -122,6 +141,11 @@ var TableComponent = {
             'th',
             null,
             '\u89D2\u8272'
+          ),
+          m(
+            'th',
+            null,
+            '#'
           )
         )
       ),
@@ -167,11 +191,14 @@ var FormComponent = {
   },
   submit: function submit(e) {
     if (Account.valid(this.form, this.errors)) {
-      Account.create(this.form).then(function () {
+      (FormComponent.isEdit() ? Account.update(this.form) : Account.create(this.form)).then(function () {
         $('#accountModal').modal('hide');
         FormComponent.reset();
       });
     }
+  },
+  isEdit: function isEdit() {
+    return !!FormComponent.form.id;
   },
   errorClassName: function errorClassName(name) {
     return FormComponent.errors[name] ? ' has-error' : '';
@@ -217,7 +244,8 @@ var FormComponent = {
           { className: 'control-label', htmlFor: 'account_email' },
           '\u90AE\u7BB1'
         ),
-        m('input', { id: 'account_email', type: 'text', className: 'form-control', value: this.form.email, oninput: m.withAttr('value', this.updateForm('email')) }),
+        m('input', { id: 'account_email', type: 'text', className: 'form-control', disabled: this.isEdit(),
+          value: this.form.email, oninput: m.withAttr('value', this.updateForm('email')) }),
         this.errorMessage('email')
       ),
       m(
@@ -228,7 +256,8 @@ var FormComponent = {
           { className: 'control-label', htmlFor: 'account_password' },
           '\u5BC6\u7801'
         ),
-        m('input', { id: 'account_password', type: 'password', className: 'form-control', value: this.form.password, oninput: m.withAttr('value', this.updateForm('password')) }),
+        m('input', { id: 'account_password', type: 'password', className: 'form-control', disabled: this.isEdit(),
+          value: this.form.password, oninput: m.withAttr('value', this.updateForm('password')) }),
         this.errorMessage('password')
       ),
       m(
@@ -239,7 +268,7 @@ var FormComponent = {
           { className: 'control-label', htmlFor: 'account_password_confirmation' },
           '\u786E\u8BA4\u5BC6\u7801'
         ),
-        m('input', { id: 'account_password_confirmation', type: 'password', className: 'form-control',
+        m('input', { id: 'account_password_confirmation', type: 'password', className: 'form-control', disabled: this.isEdit(),
           value: this.form.password_confirmation, oninput: m.withAttr('value', this.updateForm('password_confirmation')) }),
         this.errorMessage('password_confirmation')
       ),
@@ -259,7 +288,7 @@ var FormComponent = {
         { className: 'form-group clearfix' },
         m(
           'button',
-          { type: 'button', 'class': 'btn btn-default', 'data-dismiss': 'modal', onclick: this.reset.bind(this) },
+          { type: 'button', 'class': 'btn btn-default', 'data-dismiss': 'modal' },
           '\u5173\u95ED'
         ),
         m(
@@ -274,7 +303,7 @@ var FormComponent = {
 
 module.exports = {
   view: function view() {
-    return [m(FilterComponent), m(TableComponent), m(ModalComponent, { title: FormComponent.title }, m(FormComponent))];
+    return [m(FilterComponent), m(TableComponent), m(ModalComponent, m(FormComponent))];
   }
 };
 
@@ -328,7 +357,10 @@ var validations = {
       return (/([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})/.test(value)
       );
     },
-    message: '邮箱格式不合法'
+    message: '邮箱格式不合法',
+    skip: function skip() {
+      return !!this.id;
+    }
   },
   role: {
     pattern: function pattern(value) {
@@ -341,13 +373,19 @@ var validations = {
     pattern: function pattern(value) {
       return value.length > 4;
     },
-    message: '密码长度必须大于4'
+    message: '密码长度必须大于4',
+    skip: function skip() {
+      return !!this.id;
+    }
   },
   password_confirmation: {
     pattern: function pattern(value) {
       return value === this.password;
     },
-    message: '两次输入密码不同'
+    message: '两次输入密码不同',
+    skip: function skip() {
+      return !!this.id;
+    }
   }
 };
 
@@ -373,6 +411,21 @@ var Account = {
       Account.list.unshift(resp);
     });
   },
+  update: function update(form) {
+    return m.request({
+      method: 'PUT',
+      url: '/admin/accounts/update/' + form.id,
+      data: { account: form },
+      withCredentials: true,
+      config: utils.xhrConfig
+    }).then(function (resp) {
+      for (var i = 0; i < Account.list.length; i++) {
+        if (resp.id === Account.list[i].id) {
+          Account.list[i] = resp;
+        }
+      }
+    });
+  },
   valid: function valid(form, errors) {
     var validation,
         flag = true;
@@ -380,11 +433,13 @@ var Account = {
     for (var key in form) {
       validation = validations[key];
       if (validation) {
-        if (!validation.pattern.call(form, form[key])) {
-          errors[key] = validation.message;
-          flag = false;
-        } else {
-          errors[key] = null;
+        if (!(validation.skip && validation.skip.call(form))) {
+          if (!validation.pattern.call(form, form[key])) {
+            errors[key] = validation.message;
+            flag = false;
+          } else {
+            errors[key] = null;
+          }
         }
       }
     }

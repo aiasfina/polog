@@ -4,6 +4,7 @@ var ModalComponent = require('./modal.jsx');
 
 var FilterComponent = {
   newAccount: function() {
+    FormComponent.reset();
     $('#accountModal').modal();
   },
   view: function() {
@@ -32,6 +33,15 @@ var TableComponent = {
   selectAccount: function() {
     Account.selectedObject[this.id] = Account.selectedObject[this.id] ? null : this;
   },
+  edit: function(account) {
+    return function() {
+      FormComponent.reset();
+      ['id', 'name', 'surname', 'email', 'role'].forEach(function(name) {
+        FormComponent.form[name] = account[name];
+      });
+      $('#accountModal').modal();
+    }
+  },
   renderRowView: function(account) {
     return(
       <tr className={Account.selectedObject[account.id] ? 'active' : ''}
@@ -41,6 +51,7 @@ var TableComponent = {
         <td>{account.name}</td>
         <td>{account.email}</td>
         <td>{account.role}</td>
+        <td><a href="javascript:void(0);" onclick={this.edit(account)}><i className="fa fa-edit"></i></a></td>
       </tr>
     )
   },
@@ -55,6 +66,7 @@ var TableComponent = {
             <th>用户名</th>
             <th>邮箱</th>
             <th>角色</th>
+            <th>#</th>
           </tr>
         </thead>
         <tbody>
@@ -98,12 +110,15 @@ var FormComponent = {
   },
   submit: function(e) {
     if (Account.valid(this.form, this.errors)) {
-      Account.create(this.form)
+      (FormComponent.isEdit() ? Account.update(this.form) : Account.create(this.form))
       .then(function() {
         $('#accountModal').modal('hide');
         FormComponent.reset();
       });
     }
+  },
+  isEdit: function() {
+    return !!FormComponent.form.id
   },
   errorClassName: function(name) {
     return FormComponent.errors[name] ? ' has-error' : ''
@@ -126,17 +141,19 @@ var FormComponent = {
         </div>
         <div className={"form-group" + this.errorClassName('email')}>
           <label className="control-label" htmlFor="account_email">邮箱</label>
-          <input id="account_email" type="text" className="form-control" value={this.form.email} oninput={m.withAttr('value', this.updateForm('email'))} />
+          <input id="account_email" type="text" className="form-control" disabled={this.isEdit()}
+            value={this.form.email} oninput={m.withAttr('value', this.updateForm('email'))} />
           {this.errorMessage('email')}
         </div>
         <div className={"form-group" + this.errorClassName('password')}>
           <label className="control-label" htmlFor="account_password">密码</label>
-          <input id="account_password" type="password" className="form-control" value={this.form.password} oninput={m.withAttr('value', this.updateForm('password'))} />
+          <input id="account_password" type="password" className="form-control" disabled={this.isEdit()}
+            value={this.form.password} oninput={m.withAttr('value', this.updateForm('password'))} />
           {this.errorMessage('password')}
         </div>
         <div className={"form-group" + this.errorClassName('password_confirmation')}>
           <label className="control-label" htmlFor="account_password_confirmation">确认密码</label>
-          <input id="account_password_confirmation" type="password" className="form-control" 
+          <input id="account_password_confirmation" type="password" className="form-control" disabled={this.isEdit()}
             value={this.form.password_confirmation} oninput={m.withAttr('value', this.updateForm('password_confirmation'))} />
             {this.errorMessage('password_confirmation')}
         </div>
@@ -146,7 +163,7 @@ var FormComponent = {
           {this.errorMessage('role')}
         </div>
         <div className="form-group clearfix">
-          <button type="button" class="btn btn-default" data-dismiss="modal" onclick={this.reset.bind(this)}>关闭</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
           <button type="button" class="btn btn-primary pull-right" onclick={this.submit.bind(this)}>保存</button>
         </div>
       </form>
@@ -159,7 +176,7 @@ module.exports = {
     return [
       m(FilterComponent),
       m(TableComponent),
-      m(ModalComponent, {title: FormComponent.title}, m(FormComponent))
+      m(ModalComponent, m(FormComponent))
     ]
   }
 }
