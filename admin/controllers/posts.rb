@@ -62,4 +62,13 @@ Polog::Admin.controllers :posts do
       halt 404
     end
   end
+
+  delete :destroy, with: :id, provides: :json do
+    @post = current_account.posts.where(id: params[:id]).first
+    if @post
+      @post.destroy
+    else
+      halt 404
+    end
+  end
 end

@@ -568,7 +568,16 @@ var TableComponent = {
     this.published = checked;
     Post.publish(this);
   },
-  renderRowView: function renderRowView(post) {
+  destroy: function destroy(post, index) {
+    return function () {
+      if (confirm('是否删除？') === true) {
+        Post.destroy(post).then(function () {
+          Post.list.splice(index, 1);
+        });
+      }
+    };
+  },
+  renderRowView: function renderRowView(post, index) {
     return m(
       'tr',
       { className: Post.selectedObject[post.id] ? 'active' : '',
@@ -598,9 +607,15 @@ var TableComponent = {
         null,
         m(
           'a',
-          { href: '/admin/posts/edit/' + post.id },
-          ' ',
-          m('i', { className: 'fa fa-edit' })
+          { href: '/admin/posts/edit/' + post.id, className: 'btn btn-primary btn-xs' },
+          m('i', { className: 'fa fa-edit' }),
+          ' \u7F16\u8F91'
+        ),
+        m(
+          'a',
+          { href: 'javascript:void(0);', className: 'btn btn-danger btn-xs', onclick: TableComponent.destroy(post, index) },
+          m('i', { className: 'fa fa-times' }),
+          ' \u5220\u9664'
         )
       )
     );
@@ -646,8 +661,8 @@ var TableComponent = {
       m(
         'tbody',
         null,
-        Post.list.map(function (post) {
-          return TableComponent.renderRowView(post);
+        Post.list.map(function (post, index) {
+          return TableComponent.renderRowView(post, index);
         })
       )
     );
@@ -825,6 +840,14 @@ var Post = {
       config: utils.xhrConfig
     }).then(function (resp) {
       post.published_at = resp.published_at;
+    });
+  },
+  destroy: function destroy(post) {
+    return m.request({
+      method: 'DELETE',
+      url: '/admin/posts/destroy/' + post.id,
+      withCredentials: true,
+      config: utils.xhrConfig
     });
   },
   selectedObject: {}

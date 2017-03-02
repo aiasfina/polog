@@ -21,7 +21,17 @@ var TableComponent = {
     this.published = checked;
     Post.publish(this);
   },
-  renderRowView: function(post) {
+  destroy: function(post, index) {
+    return function() {
+      if (confirm('是否删除？') === true) {
+        Post.destroy(post)
+        .then(function() {
+          Post.list.splice(index, 1);
+        });
+      }
+    }
+  },
+  renderRowView: function(post, index) {
     return(
       <tr className={Post.selectedObject[post.id] ? 'active' : ''}
         onclick={this.select.bind(post)} >
@@ -31,7 +41,10 @@ var TableComponent = {
           <input type="checkbox" onclick={m.withAttr('checked', TableComponent.publish.bind(post))} checked={post.published} />
         </td>
         <td>{post.published_at}</td>
-        <td><a href={'/admin/posts/edit/' + post.id}> <i className="fa fa-edit"></i></a></td>
+        <td>
+          <a href={'/admin/posts/edit/' + post.id} className="btn btn-primary btn-xs"><i className="fa fa-edit"></i> 编辑</a>
+          <a href="javascript:void(0);" className="btn btn-danger btn-xs" onclick={TableComponent.destroy(post, index)}><i className="fa fa-times"></i> 删除</a>
+        </td>
       </tr>
     )
   },
@@ -49,8 +62,8 @@ var TableComponent = {
           </tr>
         </thead>
         <tbody>
-          {Post.list.map(function(post) {
-            return TableComponent.renderRowView(post)
+          {Post.list.map(function(post, index) {
+            return TableComponent.renderRowView(post, index)
           })}
         </tbody>
       </table>

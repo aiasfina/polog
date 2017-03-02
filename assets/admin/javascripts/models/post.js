@@ -50,6 +50,14 @@ var Post = {
       post.published_at = resp.published_at;
     })
   },
+  destroy: function(post) {
+    return m.request({
+      method: 'DELETE',
+      url: '/admin/posts/destroy/' + post.id,
+      withCredentials: true,
+      config: utils.xhrConfig
+    })
+  },
   selectedObject: {}
 }
 
