@@ -7,7 +7,8 @@ require('bootstrap-tagsinput/dist/bootstrap-tagsinput.js');
 var Form = {
   title: '',
   tags: [],
-  content: ''
+  content: '',
+  published: false
 }
 
 var TagInputComponent = {
@@ -51,6 +52,7 @@ var PostEditorComponent = {
         Form.title = resp.title;
         Form.tags = resp.tags;
         Form.content = resp.content;
+        Form.published = resp.published;
         
         MarkdownComponent.setContent(Form.content);
 
@@ -91,6 +93,17 @@ var PostEditorComponent = {
                   value={Form.title} />
               </div>
             </div>
+            <div className="col-lg-6">
+              <div className="form-group">
+                <label className="control-label">是否发布</label>
+                <select className="form-control" onchange={m.withAttr('value', function(value) { Form.published = (value == 'true') })}>
+                  <option value="true" selected={Form.published}>是</option>
+                  <option value="false" selected={!Form.published}>否</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div className="row">
             <div className="col-lg-6">
               {m(TagInputComponent, {label: '标签', placeholder: '请输入标签，最多只能输入5个'})}
             </div>

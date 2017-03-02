@@ -17,13 +17,20 @@ var TableComponent = {
   select: function() {
     Post.selectedObject[this.id] = Post.selectedObject[this.id] ? null : this;
   },
+  publish: function(checked) {
+    this.published = checked;
+    Post.publish(this);
+  },
   renderRowView: function(post) {
     return(
       <tr className={Post.selectedObject[post.id] ? 'active' : ''}
         onclick={this.select.bind(post)} >
         <td><input type="checkbox" checked={!!Post.selectedObject[post.id]} /></td>
         <td>{post.title}</td>
-        <td>{post.published_at || '未发布'}</td>
+        <td>
+          <input type="checkbox" onclick={m.withAttr('checked', TableComponent.publish.bind(post))} checked={post.published} />
+        </td>
+        <td>{post.published_at}</td>
         <td><a href={'/admin/posts/edit/' + post.id}> <i className="fa fa-edit"></i></a></td>
       </tr>
     )
@@ -36,6 +43,7 @@ var TableComponent = {
             <th><input type="checkbox" onclick={m.withAttr('checked', this.selectAll.bind(this))}
               checked={this.checkedAll} /></th>
             <th>标题</th>
+            <th>发布</th>
             <th>发布时间</th>
             <th>#</th>
           </tr>

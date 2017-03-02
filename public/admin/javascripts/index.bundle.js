@@ -384,7 +384,8 @@ require('bootstrap-tagsinput/dist/bootstrap-tagsinput.js');
 var Form = {
   title: '',
   tags: [],
-  content: ''
+  content: '',
+  published: false
 };
 
 var TagInputComponent = {
@@ -429,6 +430,7 @@ var PostEditorComponent = {
         Form.title = resp.title;
         Form.tags = resp.tags;
         Form.content = resp.content;
+        Form.published = resp.published;
 
         MarkdownComponent.setContent(Form.content);
 
@@ -492,6 +494,39 @@ var PostEditorComponent = {
           m(
             'div',
             { className: 'col-lg-6' },
+            m(
+              'div',
+              { className: 'form-group' },
+              m(
+                'label',
+                { className: 'control-label' },
+                '\u662F\u5426\u53D1\u5E03'
+              ),
+              m(
+                'select',
+                { className: 'form-control', onchange: m.withAttr('value', function (value) {
+                    Form.published = value == 'true';
+                  }) },
+                m(
+                  'option',
+                  { value: 'true', selected: Form.published },
+                  '\u662F'
+                ),
+                m(
+                  'option',
+                  { value: 'false', selected: !Form.published },
+                  '\u5426'
+                )
+              )
+            )
+          )
+        ),
+        m(
+          'div',
+          { className: 'row' },
+          m(
+            'div',
+            { className: 'col-lg-6' },
             m(TagInputComponent, { label: '标签', placeholder: '请输入标签，最多只能输入5个' })
           )
         ),
@@ -529,6 +564,10 @@ var TableComponent = {
   select: function select() {
     Post.selectedObject[this.id] = Post.selectedObject[this.id] ? null : this;
   },
+  publish: function publish(checked) {
+    this.published = checked;
+    Post.publish(this);
+  },
   renderRowView: function renderRowView(post) {
     return m(
       'tr',
@@ -547,7 +586,12 @@ var TableComponent = {
       m(
         'td',
         null,
-        post.published_at || '未发布'
+        m('input', { type: 'checkbox', onclick: m.withAttr('checked', TableComponent.publish.bind(post)), checked: post.published })
+      ),
+      m(
+        'td',
+        null,
+        post.published_at
       ),
       m(
         'td',
@@ -581,6 +625,11 @@ var TableComponent = {
             'th',
             null,
             '\u6807\u9898'
+          ),
+          m(
+            'th',
+            null,
+            '\u53D1\u5E03'
           ),
           m(
             'th',
@@ -765,6 +814,17 @@ var Post = {
       data: { post: form },
       withCredentials: true,
       config: utils.xhrConfig
+    });
+  },
+  publish: function publish(post) {
+    return m.request({
+      method: 'PUT',
+      url: '/admin/posts/publish/' + post.id,
+      data: { published: post.published },
+      withCredentials: true,
+      config: utils.xhrConfig
+    }).then(function (resp) {
+      post.published_at = resp.published_at;
     });
   },
   selectedObject: {}

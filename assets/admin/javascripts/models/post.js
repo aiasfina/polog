@@ -38,6 +38,18 @@ var Post = {
       config: utils.xhrConfig
     })
   },
+  publish: function(post) {
+    return m.request({
+      method: 'PUT',
+      url: '/admin/posts/publish/' + post.id,
+      data: {published: post.published},
+      withCredentials: true,
+      config: utils.xhrConfig
+    })
+    .then(function(resp) {
+      post.published_at = resp.published_at;
+    })
+  },
   selectedObject: {}
 }
 

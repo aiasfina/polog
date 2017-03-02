@@ -1,2 +1,2 @@
 collection @posts
-attributes :id, :title, :published_at
+attributes :id, :title, :published_at, :published

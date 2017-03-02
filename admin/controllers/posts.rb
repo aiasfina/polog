@@ -1,6 +1,5 @@
 Polog::Admin.controllers :posts do
   get :index, provides: [:html, :json] do
-
     case content_type
       when :html then render 'posts/index'
       when :json then
@@ -40,6 +39,19 @@ Polog::Admin.controllers :posts do
     if @post
       if @post.update_attributes params[:post]
         Rabl::Renderer.json(@post, 'posts/show', view_path: 'admin/views')
+      else
+        halt 500
+      end
+    else
+      halt 404
+    end
+  end
+
+  put :publish, with: :id, provides: :json do
+    @post = current_account.posts.where(id: params[:id]).first
+    if @post
+      if @post.update published: params[:published]
+        {published_at: @post.published_at}.to_json
       else
         halt 500
       end
