@@ -39,3 +39,5 @@ gem 'rack-parser', :require => 'rack/parser'
 
 gem 'binding_of_caller'
 gem 'pry'
+
+gem 'rabl'
