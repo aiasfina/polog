@@ -67,9 +67,9 @@ var PostEditorComponent = {
     Form.content = MarkdownComponent.getContent();
 
     if (Form.id) {
-      Post.update(form);
+      Post.update(Form);
     } else {
-      Post.create(form)
+      Post.create(Form)
       .then(function(resp) {
         Form.id = resp.id;
       });
