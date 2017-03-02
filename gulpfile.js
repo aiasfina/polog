@@ -38,7 +38,9 @@ gulp.task('sass', function() {
 
   var includePaths = [
     path.join(__dirname, '/node_modules/bootstrap-sass/assets/stylesheets/'),
-    path.join(__dirname, '/node_modules/font-awesome/scss/')
+    path.join(__dirname, '/node_modules/font-awesome/scss/'),
+    path.join(__dirname, '/node_modules/bootstrap-tagsinput/dist/'),
+    path.join(__dirname, '/node_modules/simplemde/dist/')
   ]
 
   entries.map(function(entry) {

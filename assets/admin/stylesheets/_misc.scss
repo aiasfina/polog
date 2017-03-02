@@ -5,3 +5,10 @@
 .text-right {
   text-align: right;
 }
+
+.bootstrap-tagsinput {
+  @extend .form-control;
+  input {
+    min-width: 220px;
+  }
+}

@@ -6,6 +6,9 @@ $fa-font-path: './fonts';
 @import './main';
 @import './table';
 @import './button';
+@import './simplemde';
 
 @import 'bootstrap';
 @import 'font-awesome';
+@import 'bootstrap-tagsinput';
+@import 'simplemde.min';

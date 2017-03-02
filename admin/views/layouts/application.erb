@@ -14,14 +14,20 @@
     <div class="menu">
       <div class="brand"><%= link_to 'Polog', url(:base, :index) %></div>
       <ul>
-        <li class="<%= 'active' if request.path.start_with? url(:posts, :index) %>">
+        <li class="<%= 'active' if request.path == url(:posts, :new) %>">
+          <% link_to url(:posts, :new) do %>
+            <%= content_tag(:i, '', class: 'fa fa-pencil') %>
+            <%= content_tag(:p, '编写文章') %>
+          <% end %>
+        </li>
+        <li class="<%= 'active' if request.path == url(:posts, :index) %>">
           <% link_to url(:posts, :index) do %>
             <%= content_tag(:i, '', class: 'fa fa-list') %>
             <%= content_tag(:p, '文章管理') %>
           <% end %>
         </li>
 
-        <li class="<%= 'active' if request.path.start_with? url(:accounts, :index) %>">
+        <li class="<%= 'active' if request.path == url(:accounts, :index) %>">
           <% link_to url(:accounts, :index) do %>
             <%= content_tag(:i, '', class: 'fa fa-users') %>
             <%= content_tag(:p, '账号管理') %>
