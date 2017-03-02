@@ -381,6 +381,12 @@ var utils = require('../utils.js');
 var MarkdownComponent = require('./markdown.jsx');
 require('bootstrap-tagsinput/dist/bootstrap-tagsinput.js');
 
+var Form = {
+  title: '',
+  tags: [],
+  content: ''
+};
+
 var TagInputComponent = {
   max: 5,
   $el: null,
@@ -389,10 +395,10 @@ var TagInputComponent = {
       var $el = TagInputComponent.$el = $(vnode.dom);
       $el.tagsinput({ maxTags: TagInputComponent.max });
       $el.on('itemAdded', function (event) {
-        PostEditorComponent.form.tags.push(event.item);
+        Form.tags.push(event.item);
       }).on('itemRemoved', function (event) {
-        var index = PostEditorComponent.form.tags.indexOf(event.item);
-        PostEditorComponent.form.tags.splice(index, 1);
+        var index = Form.tags.indexOf(event.item);
+        Form.tags.splice(index, 1);
       });
     }
   },
@@ -410,95 +416,90 @@ var TagInputComponent = {
         vnode.attrs.label
       ),
       m('input', { className: 'form-control', 'data-role': 'tagsinput', type: 'text', id: this.guid(),
-        placeholder: vnode.attrs.placeholder, oncreate: TagInputComponent.oncreate, value: PostEditorComponent.form.tags.join(',') })
+        placeholder: vnode.attrs.placeholder, oncreate: TagInputComponent.oncreate, value: Form.tags.join(',') })
     );
   }
 };
 
 var PostEditorComponent = {
   oninit: function oninit() {
-    var form = PostEditorComponent.form;
-
     if (window.postId) {
       Post.load(window.postId).then(function (resp) {
-        form.id = resp.id;
-        form.title = resp.title;
-        form.tags = resp.tags;
-        form.content = resp.content;
+        Form.id = resp.id;
+        Form.title = resp.title;
+        Form.tags = resp.tags;
+        Form.content = resp.content;
 
-        MarkdownComponent.setContent(form.content);
+        MarkdownComponent.setContent(Form.content);
 
-        for (var i = 0; i < form.tags.length; i++) {
-          TagInputComponent.$el.tagsinput('add', form.tags[i]);
+        for (var i = 0; i < Form.tags.length; i++) {
+          TagInputComponent.$el.tagsinput('add', Form.tags[i]);
         }
       });
     }
   },
-  form: {
-    title: '',
-    tags: [],
-    content: ''
-  },
   onsubmit: function onsubmit(e) {
     e.preventDefault();
 
-    var form = PostEditorComponent.form;
+    Form.tags = TagInputComponent.$el.tagsinput('items');
+    Form.content = MarkdownComponent.getContent();
 
-    form.tags = TagInputComponent.$el.tagsinput('items');
-    form.content = MarkdownComponent.getContent();
-
-    if (form.id) {
+    if (Form.id) {
       Post.update(form);
     } else {
       Post.create(form).then(function (resp) {
-        form.id = resp.id;
+        Form.id = resp.id;
       });
     }
   },
   view: function view(vnode) {
     return m(
-      'form',
-      { className: 'form', onsubmit: PostEditorComponent.onsubmit },
+      'div',
+      { className: 'container' },
       m(
-        'div',
-        { className: 'form-group clearfix' },
-        m(
-          'button',
-          { className: 'btn btn-primary pull-right' },
-          '\u63D0\u4EA4'
-        )
-      ),
-      m(
-        'div',
-        { className: 'row' },
+        'form',
+        { className: 'form', onsubmit: PostEditorComponent.onsubmit },
         m(
           'div',
-          { className: 'col-lg-6' },
+          { className: 'form-group clearfix' },
           m(
-            'div',
-            { className: 'form-group' },
-            m(
-              'label',
-              { className: 'control-label' },
-              '\u6807\u9898'
-            ),
-            m('input', { placeholder: '\u8BF7\u8F93\u5165\u6807\u9898', className: 'form-control', type: 'text',
-              oninput: m.withAttr('value', function (value) {
-                PostEditorComponent.form.title = value;
-              }),
-              value: PostEditorComponent.form.title })
+            'button',
+            { className: 'btn btn-primary pull-right' },
+            '\u63D0\u4EA4'
           )
         ),
         m(
           'div',
-          { className: 'col-lg-6' },
-          m(TagInputComponent, { label: '标签', placeholder: '请输入标签，最多只能输入5个' })
+          { className: 'row' },
+          m(
+            'div',
+            { className: 'col-lg-6' },
+            m(
+              'div',
+              { className: 'form-group' },
+              m(
+                'label',
+                { className: 'control-label' },
+                '\u6807\u9898'
+              ),
+              m('input', { placeholder: '\u8BF7\u8F93\u5165\u6807\u9898', className: 'form-control', type: 'text',
+                oninput: m.withAttr('value', function (value) {
+                  Form.title = value;
+                }),
+                value: Form.title })
+            )
+          ),
+          m(
+            'div',
+            { className: 'col-lg-6' },
+            m(TagInputComponent, { label: '标签', placeholder: '请输入标签，最多只能输入5个' })
+          )
+        ),
+        m(
+          'div',
+          { className: 'row' },
+          m(MarkdownComponent)
         )
-      ),
-      m(
-        'div',
-        { className: 'row' },
-        m(MarkdownComponent)
       )
     );
   }
