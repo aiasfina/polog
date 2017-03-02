@@ -14,8 +14,8 @@
     <div class="menu">
       <div class="brand"><%= link_to 'Polog', url(:base, :index) %></div>
       <ul>
-        <li>
-          <% link_to url(:accounts, :index) do %>
+        <li class="<%= 'active' if request.path.start_with? url(:posts, :index) %>">
+          <% link_to url(:posts, :index) do %>
             <%= content_tag(:i, '', class: 'fa fa-list') %>
             <%= content_tag(:p, '文章管理') %>
           <% end %>

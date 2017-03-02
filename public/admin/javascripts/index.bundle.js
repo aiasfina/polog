@@ -9,7 +9,7 @@ window.initAccountIndex = function () {
   m.mount(el, tableComponent);
 };
 
-},{"./components/account_table.jsx":2,"mithril":7}],2:[function(require,module,exports){
+},{"./components/account_table.jsx":2,"mithril":10}],2:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -307,7 +307,7 @@ module.exports = {
   }
 };
 
-},{"../models/account.js":5,"./modal.jsx":3,"mithril":7}],3:[function(require,module,exports){
+},{"../models/account.js":6,"./modal.jsx":3,"mithril":10}],3:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -338,14 +338,119 @@ var ModalComponent = {
 
 module.exports = ModalComponent;
 
-},{"mithril":7}],4:[function(require,module,exports){
+},{"mithril":10}],4:[function(require,module,exports){
+'use strict';
+
+var m = require('mithril');
+var Post = require('../models/post.js');
+
+var TableComponent = {
+  oninit: Post.loadList,
+  checkedAll: false,
+  selectAll: function selectAll(checked) {
+    this.checkedAll = checked;
+    if (checked) {
+      Post.list.forEach(function (post) {
+        Post.selectedObject[post.id] = post;
+      });
+    } else {
+      Post.selectedObject = {};
+    }
+  },
+  select: function select() {
+    Post.selectedObject[this.id] = Post.selectedObject[this.id] ? null : this;
+  },
+  renderRowView: function renderRowView(post) {
+    return m(
+      'tr',
+      { className: Post.selectedObject[post.id] ? 'active' : '',
+        onclick: this.select.bind(post) },
+      m(
+        'td',
+        null,
+        m('input', { type: 'checkbox', checked: !!Post.selectedObject[post.id] })
+      ),
+      m(
+        'td',
+        null,
+        post.title
+      ),
+      m(
+        'td',
+        null,
+        post.published_at || '未发布'
+      ),
+      m(
+        'td',
+        null,
+        m(
+          'a',
+          { href: '/admin/posts/edit/' + post.id },
+          ' ',
+          m('i', { className: 'fa fa-edit' })
+        )
+      )
+    );
+  },
+  view: function view() {
+    return m(
+      'table',
+      { 'class': 'table' },
+      m(
+        'thead',
+        null,
+        m(
+          'tr',
+          null,
+          m(
+            'th',
+            null,
+            m('input', { type: 'checkbox', onclick: m.withAttr('checked', this.selectAll.bind(this)),
+              checked: this.checkedAll })
+          ),
+          m(
+            'th',
+            null,
+            '\u6807\u9898'
+          ),
+          m(
+            'th',
+            null,
+            '\u53D1\u5E03\u65F6\u95F4'
+          ),
+          m(
+            'th',
+            null,
+            '#'
+          )
+        )
+      ),
+      m(
+        'tbody',
+        null,
+        Post.list.map(function (post) {
+          return TableComponent.renderRowView(post);
+        })
+      )
+    );
+  }
+};
+
+module.exports = {
+  view: function view() {
+    return [m(TableComponent)];
+  }
+};
+
+},{"../models/post.js":7,"mithril":10}],5:[function(require,module,exports){
 'use strict';
 
 window.jQuery = window.$ = require('jquery');
 
 require('./accounts.js');
+require('./posts.js');
 
-},{"./accounts.js":1,"jquery":8}],5:[function(require,module,exports){
+},{"./accounts.js":1,"./posts.js":8,"jquery":11}],6:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -451,7 +556,40 @@ var Account = {
 
 module.exports = Account;
 
-},{"../utils.js":6,"mithril":7}],6:[function(require,module,exports){
+},{"../utils.js":9,"mithril":10}],7:[function(require,module,exports){
+'use strict';
+
+var m = require('mithril');
+var utils = require('../utils.js');
+
+var Post = {
+  list: [],
+  loadList: function loadList() {
+    m.request({
+      method: 'GET',
+      url: '/admin/posts.json',
+      withCredentials: true
+    }).then(function (data) {
+      Post.list = data;
+    });
+  },
+  selectedObject: {}
+};
+
+module.exports = Post;
+
+},{"../utils.js":9,"mithril":10}],8:[function(require,module,exports){
+'use strict';
+
+var m = require('mithril');
+var tableComponent = require('./components/post_table.jsx');
+
+window.initPostIndex = function () {
+  var el = document.querySelectorAll('.table-wrapper')[0];
+  m.mount(el, tableComponent);
+};
+
+},{"./components/post_table.jsx":4,"mithril":10}],9:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery');
@@ -471,7 +609,7 @@ utils.xhrConfig = function (xhr) {
 
 module.exports = utils;
 
-},{"jquery":8}],7:[function(require,module,exports){
+},{"jquery":11}],10:[function(require,module,exports){
 (function (global){
 new function() {
 
@@ -1637,7 +1775,7 @@ if (typeof module !== "undefined") module["exports"] = m
 else window.m = m
 }
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],8:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.1.1
  * https://jquery.com/
@@ -11859,4 +11997,4 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}]},{},[4]);
+},{}]},{},[5]);
