@@ -176,7 +176,7 @@ module.exports = {
     return [
       m(FilterComponent),
       m(TableComponent),
-      m(ModalComponent, m(FormComponent))
+      m(ModalComponent, {id: 'accountModal'}, m(FormComponent))
     ]
   }
 }

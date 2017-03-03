@@ -2,6 +2,9 @@ var m = require('mithril');
 var Post = require('../models/post.js');
 var utils = require('../utils.js');
 var MarkdownComponent = require('./markdown.jsx');
+var ModalComponent = require('./modal.jsx');
+var UploaderComponent = require('./uploader.jsx');
+var AttachmentList = require('./attachment_list.jsx');
 require('bootstrap-tagsinput/dist/bootstrap-tagsinput.js');
 
 var Form = {
@@ -39,6 +42,21 @@ var TagInputComponent = {
         <input className="form-control" data-role="tagsinput" type="text" id={this.guid()}
           placeholder={vnode.attrs.placeholder} oncreate={TagInputComponent.oncreate} value={Form.tags.join(',')} />
       </div>
+    )
+  }
+}
+
+var AttachmentsModalComponent = {
+  open: function(e) {
+    e.preventDefault();
+    $('#attachmentsModal').modal();
+  },
+  view: function() {
+    return(
+      [
+        m(UploaderComponent),
+        m(AttachmentList)
+      ]
     )
   }
 }
@@ -83,6 +101,7 @@ var PostEditorComponent = {
         <form className="form" onsubmit={PostEditorComponent.onsubmit}>
           <div className="form-group clearfix">
             <button className="btn btn-primary pull-right">提交</button>
+            <button className="btn btn-success pull-right" onclick={AttachmentsModalComponent.open}>附件</button>
           </div>
           <div className="row">
             <div className="col-lg-6">
@@ -112,6 +131,7 @@ var PostEditorComponent = {
             {m(MarkdownComponent)}
           </div>
         </form>
+        {m(ModalComponent, {id: 'attachmentsModal'}, m(AttachmentsModalComponent))}
       </div>
     )
   }

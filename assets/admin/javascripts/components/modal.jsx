@@ -5,7 +5,7 @@ var ModalComponent = {
   view: function(vnode) {
     this.title = vnode.attrs.title || this.title;
     return(
-      <div class="modal fade" id="accountModal" tabindex="-1" role="dialog" aria-labelledby="accountModalLabel">
+       <div class="modal fade" id={vnode.attrs.id} tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-body">

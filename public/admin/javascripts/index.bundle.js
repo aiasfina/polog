@@ -319,7 +319,7 @@ var FormComponent = {
 
 module.exports = {
   view: function view() {
-    return [m(FilterComponent), m(TableComponent), m(ModalComponent, m(FormComponent))];
+    return [m(FilterComponent), m(TableComponent), m(ModalComponent, { id: 'accountModal' }, m(FormComponent))];
   }
 };
 
@@ -429,7 +429,7 @@ var ModalComponent = {
     this.title = vnode.attrs.title || this.title;
     return m(
       'div',
-      { 'class': 'modal fade', id: 'accountModal', tabindex: '-1', role: 'dialog', 'aria-labelledby': 'accountModalLabel' },
+      { 'class': 'modal fade', id: vnode.attrs.id, tabindex: '-1', role: 'dialog' },
       m(
         'div',
         { 'class': 'modal-dialog', role: 'document' },
@@ -456,6 +456,9 @@ var m = require('mithril');
 var Post = require('../models/post.js');
 var utils = require('../utils.js');
 var MarkdownComponent = require('./markdown.jsx');
+var ModalComponent = require('./modal.jsx');
+var UploaderComponent = require('./uploader.jsx');
+var AttachmentList = require('./attachment_list.jsx');
 require('bootstrap-tagsinput/dist/bootstrap-tagsinput.js');
 
 var Form = {
@@ -496,6 +499,16 @@ var TagInputComponent = {
       m('input', { className: 'form-control', 'data-role': 'tagsinput', type: 'text', id: this.guid(),
         placeholder: vnode.attrs.placeholder, oncreate: TagInputComponent.oncreate, value: Form.tags.join(',') })
     );
+  }
+};
+
+var AttachmentsModalComponent = {
+  open: function open(e) {
+    e.preventDefault();
+    $('#attachmentsModal').modal();
+  },
+  view: function view() {
+    return [m(UploaderComponent), m(AttachmentList)];
   }
 };
 
@@ -545,6 +558,11 @@ var PostEditorComponent = {
             'button',
             { className: 'btn btn-primary pull-right' },
             '\u63D0\u4EA4'
+          ),
+          m(
+            'button',
+            { className: 'btn btn-success pull-right', onclick: AttachmentsModalComponent.open },
+            '\u9644\u4EF6'
           )
         ),
         m(
@@ -612,14 +630,15 @@ var PostEditorComponent = {
           { className: 'row' },
           m(MarkdownComponent)
         )
-      )
+      ),
+      m(ModalComponent, { id: 'attachmentsModal' }, m(AttachmentsModalComponent))
     );
   }
 };
 
 module.exports = PostEditorComponent;
 
-},{"../models/post.js":13,"../utils.js":15,"./markdown.jsx":5,"bootstrap-tagsinput/dist/bootstrap-tagsinput.js":17,"mithril":18}],8:[function(require,module,exports){
+},{"../models/post.js":13,"../utils.js":15,"./attachment_list.jsx":4,"./markdown.jsx":5,"./modal.jsx":6,"./uploader.jsx":9,"bootstrap-tagsinput/dist/bootstrap-tagsinput.js":17,"mithril":18}],8:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
