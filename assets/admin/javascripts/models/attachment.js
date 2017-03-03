@@ -8,8 +8,8 @@ var Attachment = {
       method: 'GET',
       url: '/admin/attachments.json'
     })
-    .then(function(data) {
-      Attachment.list = data;
+    .then(function(resp) {
+      Attachment.list = resp.data;
     });
   }
 }

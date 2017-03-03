@@ -39,6 +39,12 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
+    actionview (5.0.1)
+      activesupport (= 5.0.1)
+      builder (~> 3.1)
+      erubis (~> 2.7.0)
+      rails-dom-testing (~> 2.0)
+      rails-html-sanitizer (~> 1.0, >= 1.0.2)
     activemodel (5.0.1)
       activesupport (= 5.0.1)
     activerecord (5.0.1)
@@ -54,6 +60,7 @@ GEM
     bcrypt (3.1.11)
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
+    builder (3.2.3)
     carrierwave (1.0.0)
       activemodel (>= 4.0.0)
       activesupport (>= 4.0.0)
@@ -62,16 +69,39 @@ GEM
     concurrent-ruby (1.0.5)
     debug_inspector (0.0.2)
     enumerable-lazy (0.0.2)
+    erubis (2.7.0)
     i18n (0.8.1)
+    kaminari (1.0.1)
+      activesupport (>= 4.1.0)
+      kaminari-actionview (= 1.0.1)
+      kaminari-activerecord (= 1.0.1)
+      kaminari-core (= 1.0.1)
+    kaminari-actionview (1.0.1)
+      actionview
+      kaminari-core (= 1.0.1)
+    kaminari-activerecord (1.0.1)
+      activerecord
+      kaminari-core (= 1.0.1)
+    kaminari-core (1.0.1)
+    kaminari-sinatra (1.0.1)
+      actionview
+      kaminari-core (~> 1.0)
+      padrino-helpers
+      sinatra
     kramdown (1.13.2)
+    loofah (2.0.3)
+      nokogiri (>= 1.5.9)
     mail (2.6.4)
       mime-types (>= 1.16, < 4)
     method_source (0.8.2)
     mime-types (2.99.3)
+    mini_portile2 (2.1.0)
     minitest (5.10.1)
     moneta (0.8.1)
     mustermann19 (0.4.4)
       enumerable-lazy
+    nokogiri (1.7.0.1)
+      mini_portile2 (~> 2.1.0)
     pg (0.19.0)
     pry (0.10.4)
       coderay (~> 1.1.0)
@@ -84,6 +114,11 @@ GEM
       rack
     rack-protection (1.5.3)
       rack
+    rails-dom-testing (2.0.2)
+      activesupport (>= 4.2.0, < 6.0)
+      nokogiri (~> 1.6)
+    rails-html-sanitizer (1.0.3)
+      loofah (~> 2.0)
     rake (12.0.0)
     sinatra (1.4.8)
       rack (~> 1.5)
@@ -105,6 +140,8 @@ DEPENDENCIES
   bcrypt
   binding_of_caller
   carrierwave
+  kaminari
+  kaminari-sinatra
   kramdown
   padrino!
   pg
@@ -112,6 +149,7 @@ DEPENDENCIES
   rabl
   rack-parser
   rake
+  tilt
 
 BUNDLED WITH
    1.13.6

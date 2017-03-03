@@ -12,4 +12,12 @@ class Post < ActiveRecord::Base
   def published
     !!self.published_at
   end
+
+  def self.collection_json_attributes
+    [:id, :title, :published_at, :published]
+  end
+
+  def self.object_json_attributes
+    [:id, :title, :content, :tags, :published_at, :published]
+  end
 end

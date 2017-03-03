@@ -3,15 +3,15 @@ Polog::Admin.controllers :attachments do
     case content_type
       when :html then render 'attachments/index'
       when :json then
-        @attachments = Attachment.order(id: :desc)
-        Rabl::Renderer.json(@attachments, 'attachments/index', view_path: 'admin/views')
+        @attachments = Attachment.order(id: :desc).page(params[:page]).per(params[:per])
+        jj_collection @attachments, Attachment.collection_json_attributes
     end
   end
 
   post :create do
     @attachment = current_account.attachments.build(file: params[:file])
     if @attachment.save
-      Rabl::Renderer.json(@attachment, 'attachments/show', view_path: 'admin/views')
+      jj_object @attachment, Attachment.object_json_attributes
     else
       halt 500
     end

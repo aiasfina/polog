@@ -31,8 +31,8 @@ var Account = {
       url: '/admin/accounts.json',
       withCredentials: true
     })
-    .then(function(data) {
-      Account.list = data;
+    .then(function(resp) {
+      Account.list = resp.data;
     })
   },
   create: function(form) {

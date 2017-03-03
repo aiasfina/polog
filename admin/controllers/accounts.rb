@@ -5,8 +5,8 @@ Polog::Admin.controllers :accounts do
     case content_type
       when :html then render 'accounts/index'
       when :json then
-        @accounts = Account.order(id: :desc)
-        Rabl::Renderer.json(@accounts, 'accounts/index', view_path: 'admin/views')
+        @accounts = Account.order(id: :desc).page(params[:page]).per(params[:per])
+        jj_collection @accounts, Account.collection_json_attributes
     end
   end
 
@@ -18,7 +18,7 @@ Polog::Admin.controllers :accounts do
   post :create, provides: :json do
     @account = Account.new(params[:account])
     if @account.save
-      Rabl::Renderer.json(@account, 'accounts/show', view_path: 'admin/views')
+      jj_object @account, Account.object_json_attributes
     else
       halt 500
     end
@@ -28,7 +28,7 @@ Polog::Admin.controllers :accounts do
     @account = Account.find(params[:id])
     if @account
       if @account.update_attributes(params[:account])
-        Rabl::Renderer.json(@account, 'accounts/show', view_path: 'admin/views')
+        jj_object @account, Account.object_json_attributes
       else
         halt 500
       end

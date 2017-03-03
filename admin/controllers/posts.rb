@@ -3,15 +3,15 @@ Polog::Admin.controllers :posts do
     case content_type
       when :html then render 'posts/index'
       when :json then
-        @posts = Post.order(id: :desc)
-        Rabl::Renderer.json(@posts, 'posts/index', view_path: 'admin/views')
+        @posts = Post.order(id: :desc).page(params[:page]).per(params[:per])
+        jj_collection @posts, Post.collection_json_attributes
     end
   end
 
   get :show, with: :id, provides: :json do
     @post = current_account.posts.find(params[:id])
     if @post
-      Rabl::Renderer.json(@post, 'posts/show', view_path: 'admin/views')
+      jj_object @post, Post.object_json_attributes
     else
       halt 404
     end
@@ -25,7 +25,7 @@ Polog::Admin.controllers :posts do
     @post = current_account.posts.build params[:post]
     @post.content_html = @post.markdown_convert
     if @post.save
-      Rabl::Renderer.json(@post, 'posts/show', view_path: 'admin/views')
+      jj_object @post, Post.object_json_attributes
     else
       halt 500
     end
@@ -41,7 +41,7 @@ Polog::Admin.controllers :posts do
       @post.attributes = params[:post]
       @post.content_html = @post.markdown_convert
       if @post.save
-        Rabl::Renderer.json(@post, 'posts/show', view_path: 'admin/views')
+        jj_object @post, Post.object_json_attributes
       else
         halt 500
       end

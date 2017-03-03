@@ -45,3 +45,6 @@ gem 'rabl'
 gem 'kramdown'
 
 gem 'carrierwave', :require => ['carrierwave', 'carrierwave/orm/activerecord']
+
+gem 'kaminari'
+gem 'kaminari-sinatra'

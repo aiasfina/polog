@@ -9,8 +9,8 @@ var Post = {
       url: '/admin/posts.json',
       withCredentials: true
     })
-    .then(function(data) {
-      Post.list = data;
+    .then(function(resp) {
+      Post.list = resp.data;
     })
   },
   load: function(id) {

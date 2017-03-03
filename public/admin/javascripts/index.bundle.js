@@ -867,8 +867,8 @@ var Account = {
       method: 'GET',
       url: '/admin/accounts.json',
       withCredentials: true
-    }).then(function (data) {
-      Account.list = data;
+    }).then(function (resp) {
+      Account.list = resp.data;
     });
   },
   create: function create(form) {
@@ -934,8 +934,8 @@ var Attachment = {
     m.request({
       method: 'GET',
       url: '/admin/attachments.json'
-    }).then(function (data) {
-      Attachment.list = data;
+    }).then(function (resp) {
+      Attachment.list = resp.data;
     });
   }
 };
@@ -955,8 +955,8 @@ var Post = {
       method: 'GET',
       url: '/admin/posts.json',
       withCredentials: true
-    }).then(function (data) {
-      Post.list = data;
+    }).then(function (resp) {
+      Post.list = resp.data;
     });
   },
   load: function load(id) {

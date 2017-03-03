@@ -41,4 +41,12 @@ class Account < ActiveRecord::Base
   def password_required
     crypted_password.blank? || password.present?
   end
+
+  def self.collection_json_attributes
+    [:id, :name, :surname, :email, :role]
+  end
+
+  def self.object_json_attributes
+    collection_json_attributes
+  end
 end

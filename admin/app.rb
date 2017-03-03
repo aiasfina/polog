@@ -13,7 +13,7 @@ module Polog
       config.include_json_root = false
     end
     Rabl.register!
-    
+    Tilt.register :str, Tilt::StringTemplate
     ##
     # Application configuration options
     #
