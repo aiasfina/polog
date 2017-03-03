@@ -9,18 +9,23 @@ window.initAccountIndex = function () {
   m.mount(el, tableComponent);
 };
 
-},{"./components/account_table.jsx":3,"mithril":17}],2:[function(require,module,exports){
+},{"./components/account_table.jsx":3,"mithril":18}],2:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
 var UploaderComponent = require('./components/uploader.jsx');
+var AttachmentList = require('./components/attachment_list.jsx');
 
 window.initUploader = function () {
   var el = document.getElementById('uploader');
-  m.mount(el, UploaderComponent);
+  m.mount(el, {
+    view: function view() {
+      return [m(UploaderComponent), m(AttachmentList)];
+    }
+  });
 };
 
-},{"./components/uploader.jsx":8,"mithril":17}],3:[function(require,module,exports){
+},{"./components/attachment_list.jsx":4,"./components/uploader.jsx":9,"mithril":18}],3:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -318,7 +323,68 @@ module.exports = {
   }
 };
 
-},{"../models/account.js":10,"./modal.jsx":5,"mithril":17}],4:[function(require,module,exports){
+},{"../models/account.js":11,"./modal.jsx":6,"mithril":18}],4:[function(require,module,exports){
+'use strict';
+
+var m = require('mithril');
+var Attachment = require('../models/attachment.js');
+var utils = require('../utils.js');
+
+var ItemComponent = {
+  itemCover: function itemCover(attachment) {
+    switch (attachment.extname) {
+      case 'png':
+      case 'jpeg':
+      case 'jpg':
+        return m(
+          'div',
+          { className: 'attachment-cover img-cover' },
+          m('img', { src: attachment.url, alt: '' })
+        );
+      default:
+        return m(
+          'div',
+          { className: 'attachment-cover default-cover' },
+          attachment.extname
+        );
+    }
+  },
+  view: function view(vnode) {
+    var attachment = vnode.attrs.attachment;
+
+    return m(
+      'li',
+      null,
+      m(
+        'p',
+        null,
+        ItemComponent.itemCover(attachment)
+      ),
+      m(
+        'p',
+        null,
+        m('input', { type: 'text', 'class': 'form-control', value: attachment.url, disabled: true, title: attachment.url })
+      )
+    );
+  }
+};
+
+var Component = {
+  oninit: Attachment.loadList,
+  view: function view() {
+    return m(
+      'ul',
+      { className: 'attachment-list' },
+      Attachment.list.map(function (attachment) {
+        return m(ItemComponent, { attachment: attachment });
+      })
+    );
+  }
+};
+
+module.exports = Component;
+
+},{"../models/attachment.js":12,"../utils.js":15,"mithril":18}],5:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -352,7 +418,7 @@ var MarkdownComponent = {
 
 module.exports = MarkdownComponent;
 
-},{"../utils.js":14,"mithril":17,"simplemde/src/js/simplemde.js":23}],5:[function(require,module,exports){
+},{"../utils.js":15,"mithril":18,"simplemde/src/js/simplemde.js":24}],6:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -383,7 +449,7 @@ var ModalComponent = {
 
 module.exports = ModalComponent;
 
-},{"mithril":17}],6:[function(require,module,exports){
+},{"mithril":18}],7:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -553,7 +619,7 @@ var PostEditorComponent = {
 
 module.exports = PostEditorComponent;
 
-},{"../models/post.js":12,"../utils.js":14,"./markdown.jsx":4,"bootstrap-tagsinput/dist/bootstrap-tagsinput.js":16,"mithril":17}],7:[function(require,module,exports){
+},{"../models/post.js":13,"../utils.js":15,"./markdown.jsx":5,"bootstrap-tagsinput/dist/bootstrap-tagsinput.js":17,"mithril":18}],8:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -686,7 +752,7 @@ module.exports = {
   }
 };
 
-},{"../models/post.js":12,"mithril":17}],8:[function(require,module,exports){
+},{"../models/post.js":13,"mithril":18}],9:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -708,6 +774,11 @@ var Component = {
         var token = utils.getCSRFToken();
         formData.append(token[0], token[1]);
       });
+
+      Component.dropzone.on('success', function (file, resp, event) {
+        Attachment.list.unshift(JSON.parse(resp));
+        m.redraw();
+      });
     }
   },
   view: function view() {
@@ -717,7 +788,7 @@ var Component = {
 
 module.exports = Component;
 
-},{"../models/attachment.js":11,"../utils.js":14,"dropzone":26,"mithril":17}],9:[function(require,module,exports){
+},{"../models/attachment.js":12,"../utils.js":15,"dropzone":27,"mithril":18}],10:[function(require,module,exports){
 'use strict';
 
 window.jQuery = window.$ = require('jquery');
@@ -726,7 +797,7 @@ require('./accounts.js');
 require('./posts.js');
 require('./attachments.js');
 
-},{"./accounts.js":1,"./attachments.js":2,"./posts.js":13,"jquery":25}],10:[function(require,module,exports){
+},{"./accounts.js":1,"./attachments.js":2,"./posts.js":14,"jquery":26}],11:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -832,7 +903,7 @@ var Account = {
 
 module.exports = Account;
 
-},{"../utils.js":14,"mithril":17}],11:[function(require,module,exports){
+},{"../utils.js":15,"mithril":18}],12:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -840,12 +911,19 @@ var utils = require('../utils.js');
 
 var Attachment = {
   list: [],
-  loadList: function loadList() {}
+  loadList: function loadList() {
+    m.request({
+      method: 'GET',
+      url: '/admin/attachments.json'
+    }).then(function (data) {
+      Attachment.list = data;
+    });
+  }
 };
 
 module.exports = Attachment;
 
-},{"../utils.js":14,"mithril":17}],12:[function(require,module,exports){
+},{"../utils.js":15,"mithril":18}],13:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -911,7 +989,7 @@ var Post = {
 
 module.exports = Post;
 
-},{"../utils.js":14,"mithril":17}],13:[function(require,module,exports){
+},{"../utils.js":15,"mithril":18}],14:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -928,7 +1006,7 @@ window.initPostEditor = function () {
   m.mount(el, EditorComponent);
 };
 
-},{"./components/post_editor.jsx":6,"./components/post_table.jsx":7,"mithril":17}],14:[function(require,module,exports){
+},{"./components/post_editor.jsx":7,"./components/post_table.jsx":8,"mithril":18}],15:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery');
@@ -955,7 +1033,7 @@ utils.guid = function () {
 
 module.exports = utils;
 
-},{"jquery":25}],15:[function(require,module,exports){
+},{"jquery":26}],16:[function(require,module,exports){
 (function (global){
 /**
  * marked - a markdown parser
@@ -2245,7 +2323,7 @@ if (typeof module !== 'undefined' && typeof exports === 'object') {
 }());
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 (function ($) {
   "use strict";
 
@@ -2910,7 +2988,7 @@ if (typeof module !== 'undefined' && typeof exports === 'object') {
   });
 })(window.jQuery);
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 (function (global){
 new function() {
 
@@ -4076,7 +4154,7 @@ if (typeof module !== "undefined") module["exports"] = m
 else window.m = m
 }
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 (function (Buffer,__dirname){
 /* globals chrome: false */
 /* globals __dirname: false */
@@ -5010,7 +5088,7 @@ if (typeof module !== 'undefined') {
 	module.exports = Typo;
 }
 }).call(this,require("buffer").Buffer,"/node_modules/.1.1.2@codemirror-spell-checker/node_modules/typo-js")
-},{"buffer":27,"fs":21}],19:[function(require,module,exports){
+},{"buffer":28,"fs":22}],20:[function(require,module,exports){
 // Use strict mode (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode)
 "use strict";
 
@@ -5130,7 +5208,7 @@ CodeMirrorSpellChecker.typo;
 
 // Export
 module.exports = CodeMirrorSpellChecker;
-},{"typo-js":18}],20:[function(require,module,exports){
+},{"typo-js":19}],21:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -5216,9 +5294,9 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],21:[function(require,module,exports){
-
 },{}],22:[function(require,module,exports){
+
+},{}],23:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -5264,7 +5342,7 @@ CodeMirror.commands.shiftTabAndUnindentMarkdownList = function (cm) {
 	}
 };
 
-},{"codemirror":33}],23:[function(require,module,exports){
+},{"codemirror":34}],24:[function(require,module,exports){
 /*global require,module*/
 "use strict";
 var CodeMirror = require("codemirror");
@@ -7293,7 +7371,7 @@ SimpleMDE.prototype.toTextArea = function() {
 };
 
 module.exports = SimpleMDE;
-},{"./codemirror/tablist":22,"codemirror":33,"codemirror-spell-checker":19,"codemirror/addon/display/fullscreen.js":28,"codemirror/addon/display/placeholder.js":29,"codemirror/addon/edit/continuelist.js":30,"codemirror/addon/mode/overlay.js":31,"codemirror/addon/selection/mark-selection.js":32,"codemirror/mode/gfm/gfm.js":34,"codemirror/mode/markdown/markdown.js":35,"codemirror/mode/xml/xml.js":37,"marked":15}],24:[function(require,module,exports){
+},{"./codemirror/tablist":23,"codemirror":34,"codemirror-spell-checker":20,"codemirror/addon/display/fullscreen.js":29,"codemirror/addon/display/placeholder.js":30,"codemirror/addon/edit/continuelist.js":31,"codemirror/addon/mode/overlay.js":32,"codemirror/addon/selection/mark-selection.js":33,"codemirror/mode/gfm/gfm.js":35,"codemirror/mode/markdown/markdown.js":36,"codemirror/mode/xml/xml.js":38,"marked":16}],25:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -7409,7 +7487,7 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.1.1
  * https://jquery.com/
@@ -17631,7 +17709,7 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 
 /*
  *
@@ -19400,7 +19478,7 @@ return jQuery;
 
 }).call(this);
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -21108,7 +21186,7 @@ function isnan (val) {
   return val !== val // eslint-disable-line no-self-compare
 }
 
-},{"base64-js":24,"ieee754":20}],28:[function(require,module,exports){
+},{"base64-js":25,"ieee754":21}],29:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -21151,7 +21229,7 @@ function isnan (val) {
   }
 });
 
-},{"../../lib/codemirror":33}],29:[function(require,module,exports){
+},{"../../lib/codemirror":34}],30:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -21215,7 +21293,7 @@ function isnan (val) {
   }
 });
 
-},{"../../lib/codemirror":33}],30:[function(require,module,exports){
+},{"../../lib/codemirror":34}],31:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -21268,7 +21346,7 @@ function isnan (val) {
   };
 });
 
-},{"../../lib/codemirror":33}],31:[function(require,module,exports){
+},{"../../lib/codemirror":34}],32:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -21360,7 +21438,7 @@ CodeMirror.overlayMode = function(base, overlay, combine) {
 
 });
 
-},{"../../lib/codemirror":33}],32:[function(require,module,exports){
+},{"../../lib/codemirror":34}],33:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -21480,7 +21558,7 @@ CodeMirror.overlayMode = function(base, overlay, combine) {
   }
 });
 
-},{"../../lib/codemirror":33}],33:[function(require,module,exports){
+},{"../../lib/codemirror":34}],34:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -30712,7 +30790,7 @@ CodeMirror.version = "5.24.2"
 return CodeMirror;
 
 })));
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -30844,7 +30922,7 @@ CodeMirror.defineMode("gfm", function(config, modeConfig) {
   CodeMirror.defineMIME("text/x-gfm", "gfm");
 });
 
-},{"../../addon/mode/overlay":31,"../../lib/codemirror":33,"../markdown/markdown":35}],35:[function(require,module,exports){
+},{"../../addon/mode/overlay":32,"../../lib/codemirror":34,"../markdown/markdown":36}],36:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -31662,7 +31740,7 @@ CodeMirror.defineMIME("text/x-markdown", "markdown");
 
 });
 
-},{"../../lib/codemirror":33,"../meta":36,"../xml/xml":37}],36:[function(require,module,exports){
+},{"../../lib/codemirror":34,"../meta":37,"../xml/xml":38}],37:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -31876,7 +31954,7 @@ CodeMirror.defineMIME("text/x-markdown", "markdown");
   };
 });
 
-},{"../lib/codemirror":33}],37:[function(require,module,exports){
+},{"../lib/codemirror":34}],38:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -32272,4 +32350,4 @@ if (!CodeMirror.mimeModes.hasOwnProperty("text/html"))
 
 });
 
-},{"../../lib/codemirror":33}]},{},[9]);
+},{"../../lib/codemirror":34}]},{},[10]);

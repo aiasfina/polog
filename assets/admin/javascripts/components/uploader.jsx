@@ -17,6 +17,11 @@ var Component = {
         var token = utils.getCSRFToken();
         formData.append(token[0], token[1]);
       })
+
+      Component.dropzone.on('success', function(file, resp, event) {
+        Attachment.list.unshift(JSON.parse(resp));
+        m.redraw();
+      });
     }
   },
   view: function() {

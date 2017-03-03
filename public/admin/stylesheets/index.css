@@ -98,6 +98,29 @@
 .simplemde-wrapper {
   padding: 0 15px; }
 
+.app .attachment-list {
+  list-style: none;
+  padding: 0;
+  margin: 40px 0 0 0; }
+  .app .attachment-list li {
+    width: 200px;
+    float: left;
+    margin-right: 20px; }
+  .app .attachment-list .attachment-cover {
+    height: 200px; }
+    .app .attachment-list .attachment-cover.img-cover {
+      display: table-cell;
+      vertical-align: middle; }
+      .app .attachment-list .attachment-cover.img-cover img {
+        max-width: 100%;
+        max-height: 100%; }
+    .app .attachment-list .attachment-cover.default-cover {
+      background-color: #52B6CE;
+      color: #fff;
+      text-align: center;
+      font-size: 32px;
+      line-height: 200px; }
+
 /*!
  * Bootstrap v3.3.7 (http://getbootstrap.com)
  * Copyright 2011-2016 Twitter, Inc.
@@ -5721,11 +5744,11 @@ button.close {
   .carousel-indicators {
     bottom: 20px; } }
 
-.clearfix:before, .clearfix:after {
+.clearfix:before, .app .attachment-list:before, .clearfix:after, .app .attachment-list:after {
   content: " ";
   display: table; }
 
-.clearfix:after {
+.clearfix:after, .app .attachment-list:after {
   clear: both; }
 
 .center-block {
