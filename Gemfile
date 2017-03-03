@@ -40,8 +40,6 @@ gem 'rack-parser', :require => 'rack/parser'
 gem 'binding_of_caller'
 gem 'pry'
 
-gem 'rabl'
-
 gem 'kramdown'
 
 gem 'carrierwave', :require => ['carrierwave', 'carrierwave/orm/activerecord']

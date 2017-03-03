@@ -1,6 +1,5 @@
 require 'active_support/core_ext/object/blank'
 require 'active_support/core_ext/string/inflections'
-require 'rabl'
 
 module Polog
   class Admin < Padrino::Application
@@ -8,12 +7,6 @@ module Polog
     register Padrino::Mailer
     register Padrino::Helpers
     register Padrino::Admin::AccessControl
-    
-    Rabl.configure do |config|
-      config.include_json_root = false
-    end
-    Rabl.register!
-    Tilt.register :str, Tilt::StringTemplate
     ##
     # Application configuration options
     #
