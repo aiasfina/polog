@@ -40,7 +40,8 @@ gulp.task('sass', function() {
     path.join(__dirname, '/node_modules/bootstrap-sass/assets/stylesheets/'),
     path.join(__dirname, '/node_modules/font-awesome/scss/'),
     path.join(__dirname, '/node_modules/bootstrap-tagsinput/dist/'),
-    path.join(__dirname, '/node_modules/simplemde/dist/')
+    path.join(__dirname, '/node_modules/simplemde/dist/'),
+    path.join(__dirname, '/node_modules/dropzone/dist/')
   ]
 
   entries.map(function(entry) {
