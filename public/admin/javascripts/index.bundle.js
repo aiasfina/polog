@@ -692,16 +692,32 @@ module.exports = {
 var m = require('mithril');
 var Dropzone = require('dropzone');
 var Attachment = require('../models/attachment.js');
+var utils = require('../utils.js');
+
+Dropzone.autoDiscover = false;
 
 var Component = {
+  dropzone: null,
+  oncreate: function oncreate(vnode) {
+    if (!Component.dropzone) {
+      Component.dropzone = new Dropzone(vnode.dom, {
+        url: '/admin/attachments/create'
+      });
+
+      Component.dropzone.on('sending', function (file, xhr, formData) {
+        var token = utils.getCSRFToken();
+        formData.append(token[0], token[1]);
+      });
+    }
+  },
   view: function view() {
-    return m('form', { action: '/admin/attachments/create', 'class': 'dropzone', enctype: 'multipart/form-data' });
+    return m('div', { className: 'dropzone' });
   }
 };
 
 module.exports = Component;
 
-},{"../models/attachment.js":11,"dropzone":26,"mithril":17}],9:[function(require,module,exports){
+},{"../models/attachment.js":11,"../utils.js":14,"dropzone":26,"mithril":17}],9:[function(require,module,exports){
 'use strict';
 
 window.jQuery = window.$ = require('jquery');

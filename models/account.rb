@@ -2,6 +2,7 @@ class Account < ActiveRecord::Base
   attr_accessor :password, :password_confirmation
 
   has_many :posts
+  has_many :attachments
 
   # Validations
   validates_presence_of     :email, :role

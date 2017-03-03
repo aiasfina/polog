@@ -43,3 +43,5 @@ gem 'pry'
 gem 'rabl'
 
 gem 'kramdown'
+
+gem 'carrierwave', :require => ['carrierwave', 'carrierwave/orm/activerecord']
