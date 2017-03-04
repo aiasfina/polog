@@ -1,5 +1,6 @@
 class Post < ActiveRecord::Base
   belongs_to :account
+  has_many :comments
 
   def markdown_convert
     Kramdown::Document.new(content).to_html

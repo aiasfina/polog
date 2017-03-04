@@ -40,6 +40,13 @@
             <%= content_tag(:p, '附件管理') %>
           <% end %>
         </li>
+
+        <li class="<%= 'active' if request.path == url(:comments, :index) %>">
+          <% link_to url(:comments, :index) do %>
+            <%= content_tag(:i, '', class: 'fa fa-comment') %>
+            <%= content_tag(:p, '评论管理') %>
+          <% end %>
+        </li>
       </ul>
     </div>
 

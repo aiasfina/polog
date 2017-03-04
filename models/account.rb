@@ -3,6 +3,7 @@ class Account < ActiveRecord::Base
 
   has_many :posts
   has_many :attachments
+  has_many :comments
 
   # Validations
   validates_presence_of     :email, :role
