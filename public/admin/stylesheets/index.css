@@ -86,14 +86,29 @@
 .app .table-wrapper .filters {
   margin: 25px 0; }
 
-.app .table-wrapper .table thead th {
-  border: none; }
+.app .table-wrapper .table thead {
+  background: #67c0d6;
+  color: #fff; }
+  .app .table-wrapper .table thead th {
+    border: none; }
 
 .app .table-wrapper .table tbody td {
   border-top: none;
   border-bottom: solid 1px #f3f3f3;
   padding-top: 10px;
   padding-bottom: 10px; }
+
+@media (min-width: 768px) {
+  #post-editor .container {
+    width: 570px; } }
+
+@media (min-width: 992px) {
+  #post-editor .container {
+    width: 790px; } }
+
+@media (min-width: 1200px) {
+  #post-editor .container {
+    width: 990px; } }
 
 .simplemde-wrapper {
   padding: 0 15px; }

@@ -5,13 +5,13 @@
     }
     .table {
       thead {
+        background: #67c0d6;
+        color: #fff;
         th {
           border: none;
         }
       }
       tbody {
-        tr {
-        }
         td {
           border-top: none;
           border-bottom: solid 1px #f3f3f3;

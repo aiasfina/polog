@@ -1,0 +1,21 @@
+#post-editor {
+  @media (min-width: 768px) {
+    .container {
+      width: 570px;
+    }
+  }
+  @media (min-width: 992px) {
+    .container {
+      width: 790px;
+    }
+  }
+  @media (min-width: 1200px) {
+    .container {
+      width: 990px;
+    }
+  }
+}
+
+.simplemde-wrapper {
+  padding: 0 15px;
+}
