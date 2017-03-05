@@ -3,14 +3,26 @@ var utils = require('../utils.js');
 
 var Comment = {
   list: [],
-  loadList: function() {
-    m.request({
-      method: 'GET',
-      url: '/admin/comments.json'
-    })
-    .then(function(resp) {
-      Comment.list = resp.data;
-    })
+  pagination: {
+    current_page: 0,
+    is_first_page: false,
+    is_last_page: false
+  },
+  loadList: function(page) {
+    page = page || 1;
+    return function() {
+      m.request({
+        method: 'GET',
+        url: '/admin/comments.json',
+        data: {page: page}
+      })
+      .then(function(resp) {
+        Comment.list = resp.data;
+        Comment.pagination.current_page = resp.current_page;
+        Comment.pagination.is_first_page = resp.is_first_page;
+        Comment.pagination.is_last_page = resp.is_last_page;
+      })
+    }
   },
   destroy: function(comment) {
     return m.request({

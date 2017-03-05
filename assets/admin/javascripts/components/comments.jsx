@@ -1,5 +1,6 @@
 var m = require('mithril');
 var TableComponent = require('./table.jsx');
+var PaginationComponent = require('./pagination.jsx');
 var Comment = require('../models/comment.js');
 
 var HeaderList = [
@@ -28,8 +29,13 @@ function destroy(comment, index) {
 }
 
 module.exports = {
-  oninit: Comment.loadList,
+  oninit: Comment.loadList(1),
   view: function() {
-    return m(TableComponent, {headerList: HeaderList, attributes: Attributes, list: Comment.list})
+    return(
+      <div>
+        {m(TableComponent, {headerList: HeaderList, attributes: Attributes, list: Comment.list})}
+        {m(PaginationComponent, {pagination: Comment.pagination, loadList: Comment.loadList})}
+      </div>
+    )
   }
 }

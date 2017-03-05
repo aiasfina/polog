@@ -9,7 +9,7 @@ window.initAccountIndex = function () {
   m.mount(el, tableComponent);
 };
 
-},{"./components/account_table.jsx":4,"mithril":22}],2:[function(require,module,exports){
+},{"./components/account_table.jsx":4,"mithril":23}],2:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -25,7 +25,7 @@ window.initUploader = function () {
   });
 };
 
-},{"./components/attachment_list.jsx":5,"./components/uploader.jsx":12,"mithril":22}],3:[function(require,module,exports){
+},{"./components/attachment_list.jsx":5,"./components/uploader.jsx":13,"mithril":23}],3:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -36,7 +36,7 @@ window.initCommentIndex = function () {
   m.mount(el, CommentsComponent);
 };
 
-},{"./components/comments.jsx":6,"mithril":22}],4:[function(require,module,exports){
+},{"./components/comments.jsx":6,"mithril":23}],4:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -334,7 +334,7 @@ module.exports = {
   }
 };
 
-},{"../models/account.js":14,"./modal.jsx":8,"mithril":22}],5:[function(require,module,exports){
+},{"../models/account.js":15,"./modal.jsx":8,"mithril":23}],5:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -395,11 +395,12 @@ var Component = {
 
 module.exports = Component;
 
-},{"../models/attachment.js":15,"../utils.js":19,"mithril":22}],6:[function(require,module,exports){
+},{"../models/attachment.js":16,"../utils.js":20,"mithril":23}],6:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
 var TableComponent = require('./table.jsx');
+var PaginationComponent = require('./pagination.jsx');
 var Comment = require('../models/comment.js');
 
 var HeaderList = ['Id', '文章标题', '用户名', '删除'];
@@ -421,13 +422,18 @@ function destroy(comment, index) {
 }
 
 module.exports = {
-  oninit: Comment.loadList,
+  oninit: Comment.loadList(1),
   view: function view() {
-    return m(TableComponent, { headerList: HeaderList, attributes: Attributes, list: Comment.list });
+    return m(
+      'div',
+      null,
+      m(TableComponent, { headerList: HeaderList, attributes: Attributes, list: Comment.list }),
+      m(PaginationComponent, { pagination: Comment.pagination, loadList: Comment.loadList })
+    );
   }
 };
 
-},{"../models/comment.js":16,"./table.jsx":11,"mithril":22}],7:[function(require,module,exports){
+},{"../models/comment.js":17,"./pagination.jsx":9,"./table.jsx":12,"mithril":23}],7:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -461,7 +467,7 @@ var MarkdownComponent = {
 
 module.exports = MarkdownComponent;
 
-},{"../utils.js":19,"mithril":22,"simplemde/src/js/simplemde.js":28}],8:[function(require,module,exports){
+},{"../utils.js":20,"mithril":23,"simplemde/src/js/simplemde.js":29}],8:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -492,7 +498,57 @@ var ModalComponent = {
 
 module.exports = ModalComponent;
 
-},{"mithril":22}],9:[function(require,module,exports){
+},{"mithril":23}],9:[function(require,module,exports){
+'use strict';
+
+var m = require('mithril');
+
+function renderPrevButton(pagination, loadList) {
+  return m(
+    'li',
+    { className: pagination.is_first_page ? 'disabled' : '' },
+    m(
+      'a',
+      { href: 'javascript:void(0);', onclick: function onclick() {
+          !pagination.is_first_page && loadList(pagination.current_page - 1)();
+        } },
+      m('i', { className: 'fa fa-angle-left' })
+    )
+  );
+}
+
+function renderNextButton(pagination, loadList) {
+  return m(
+    'li',
+    { className: pagination.is_last_page ? 'disabled' : '' },
+    m(
+      'a',
+      { href: 'javascript:void(0);', onclick: function onclick() {
+          !pagination.is_last_page && loadList(pagination.current_page + 1)();
+        } },
+      m('i', { className: 'fa fa-angle-right' })
+    )
+  );
+}
+
+module.exports = {
+  view: function view(vnode) {
+    var pagination = vnode.attrs.pagination,
+        loadList = vnode.attrs.loadList;
+
+    return m(
+      'nav',
+      { 'aria-label': 'Page navigation' },
+      m(
+        'ul',
+        { className: 'pagination' },
+        [renderPrevButton(pagination, loadList), renderNextButton(pagination, loadList)]
+      )
+    );
+  }
+};
+
+},{"mithril":23}],10:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -681,7 +737,7 @@ var PostEditorComponent = {
 
 module.exports = PostEditorComponent;
 
-},{"../models/post.js":17,"../utils.js":19,"./attachment_list.jsx":5,"./markdown.jsx":7,"./modal.jsx":8,"./uploader.jsx":12,"bootstrap-tagsinput/dist/bootstrap-tagsinput.js":21,"mithril":22}],10:[function(require,module,exports){
+},{"../models/post.js":18,"../utils.js":20,"./attachment_list.jsx":5,"./markdown.jsx":7,"./modal.jsx":8,"./uploader.jsx":13,"bootstrap-tagsinput/dist/bootstrap-tagsinput.js":22,"mithril":23}],11:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -814,7 +870,7 @@ module.exports = {
   }
 };
 
-},{"../models/post.js":17,"mithril":22}],11:[function(require,module,exports){
+},{"../models/post.js":18,"mithril":23}],12:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -896,7 +952,7 @@ module.exports = {
   }
 };
 
-},{"mithril":22}],12:[function(require,module,exports){
+},{"mithril":23}],13:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -932,7 +988,7 @@ var Component = {
 
 module.exports = Component;
 
-},{"../models/attachment.js":15,"../utils.js":19,"dropzone":31,"mithril":22}],13:[function(require,module,exports){
+},{"../models/attachment.js":16,"../utils.js":20,"dropzone":32,"mithril":23}],14:[function(require,module,exports){
 'use strict';
 
 window.jQuery = window.$ = require('jquery');
@@ -942,7 +998,7 @@ require('./posts.js');
 require('./attachments.js');
 require('./comments.js');
 
-},{"./accounts.js":1,"./attachments.js":2,"./comments.js":3,"./posts.js":18,"jquery":30}],14:[function(require,module,exports){
+},{"./accounts.js":1,"./attachments.js":2,"./comments.js":3,"./posts.js":19,"jquery":31}],15:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -1048,7 +1104,7 @@ var Account = {
 
 module.exports = Account;
 
-},{"../utils.js":19,"mithril":22}],15:[function(require,module,exports){
+},{"../utils.js":20,"mithril":23}],16:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -1068,7 +1124,7 @@ var Attachment = {
 
 module.exports = Attachment;
 
-},{"../utils.js":19,"mithril":22}],16:[function(require,module,exports){
+},{"../utils.js":20,"mithril":23}],17:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -1076,13 +1132,25 @@ var utils = require('../utils.js');
 
 var Comment = {
   list: [],
-  loadList: function loadList() {
-    m.request({
-      method: 'GET',
-      url: '/admin/comments.json'
-    }).then(function (resp) {
-      Comment.list = resp.data;
-    });
+  pagination: {
+    current_page: 0,
+    is_first_page: false,
+    is_last_page: false
+  },
+  loadList: function loadList(page) {
+    page = page || 1;
+    return function () {
+      m.request({
+        method: 'GET',
+        url: '/admin/comments.json',
+        data: { page: page }
+      }).then(function (resp) {
+        Comment.list = resp.data;
+        Comment.pagination.current_page = resp.current_page;
+        Comment.pagination.is_first_page = resp.is_first_page;
+        Comment.pagination.is_last_page = resp.is_last_page;
+      });
+    };
   },
   destroy: function destroy(comment) {
     return m.request({
@@ -1095,7 +1163,7 @@ var Comment = {
 
 module.exports = Comment;
 
-},{"../utils.js":19,"mithril":22}],17:[function(require,module,exports){
+},{"../utils.js":20,"mithril":23}],18:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -1161,7 +1229,7 @@ var Post = {
 
 module.exports = Post;
 
-},{"../utils.js":19,"mithril":22}],18:[function(require,module,exports){
+},{"../utils.js":20,"mithril":23}],19:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -1178,7 +1246,7 @@ window.initPostEditor = function () {
   m.mount(el, EditorComponent);
 };
 
-},{"./components/post_editor.jsx":9,"./components/post_table.jsx":10,"mithril":22}],19:[function(require,module,exports){
+},{"./components/post_editor.jsx":10,"./components/post_table.jsx":11,"mithril":23}],20:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery');
@@ -1205,7 +1273,7 @@ utils.guid = function () {
 
 module.exports = utils;
 
-},{"jquery":30}],20:[function(require,module,exports){
+},{"jquery":31}],21:[function(require,module,exports){
 (function (global){
 /**
  * marked - a markdown parser
@@ -2495,7 +2563,7 @@ if (typeof module !== 'undefined' && typeof exports === 'object') {
 }());
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 (function ($) {
   "use strict";
 
@@ -3160,7 +3228,7 @@ if (typeof module !== 'undefined' && typeof exports === 'object') {
   });
 })(window.jQuery);
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 (function (global){
 new function() {
 
@@ -4326,7 +4394,7 @@ if (typeof module !== "undefined") module["exports"] = m
 else window.m = m
 }
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 (function (Buffer,__dirname){
 /* globals chrome: false */
 /* globals __dirname: false */
@@ -5260,7 +5328,7 @@ if (typeof module !== 'undefined') {
 	module.exports = Typo;
 }
 }).call(this,require("buffer").Buffer,"/node_modules/.1.1.2@codemirror-spell-checker/node_modules/typo-js")
-},{"buffer":32,"fs":26}],24:[function(require,module,exports){
+},{"buffer":33,"fs":27}],25:[function(require,module,exports){
 // Use strict mode (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode)
 "use strict";
 
@@ -5380,7 +5448,7 @@ CodeMirrorSpellChecker.typo;
 
 // Export
 module.exports = CodeMirrorSpellChecker;
-},{"typo-js":23}],25:[function(require,module,exports){
+},{"typo-js":24}],26:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -5466,9 +5534,9 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],26:[function(require,module,exports){
-
 },{}],27:[function(require,module,exports){
+
+},{}],28:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -5514,7 +5582,7 @@ CodeMirror.commands.shiftTabAndUnindentMarkdownList = function (cm) {
 	}
 };
 
-},{"codemirror":38}],28:[function(require,module,exports){
+},{"codemirror":39}],29:[function(require,module,exports){
 /*global require,module*/
 "use strict";
 var CodeMirror = require("codemirror");
@@ -7543,7 +7611,7 @@ SimpleMDE.prototype.toTextArea = function() {
 };
 
 module.exports = SimpleMDE;
-},{"./codemirror/tablist":27,"codemirror":38,"codemirror-spell-checker":24,"codemirror/addon/display/fullscreen.js":33,"codemirror/addon/display/placeholder.js":34,"codemirror/addon/edit/continuelist.js":35,"codemirror/addon/mode/overlay.js":36,"codemirror/addon/selection/mark-selection.js":37,"codemirror/mode/gfm/gfm.js":39,"codemirror/mode/markdown/markdown.js":40,"codemirror/mode/xml/xml.js":42,"marked":20}],29:[function(require,module,exports){
+},{"./codemirror/tablist":28,"codemirror":39,"codemirror-spell-checker":25,"codemirror/addon/display/fullscreen.js":34,"codemirror/addon/display/placeholder.js":35,"codemirror/addon/edit/continuelist.js":36,"codemirror/addon/mode/overlay.js":37,"codemirror/addon/selection/mark-selection.js":38,"codemirror/mode/gfm/gfm.js":40,"codemirror/mode/markdown/markdown.js":41,"codemirror/mode/xml/xml.js":43,"marked":21}],30:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -7659,7 +7727,7 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.1.1
  * https://jquery.com/
@@ -17881,7 +17949,7 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 
 /*
  *
@@ -19650,7 +19718,7 @@ return jQuery;
 
 }).call(this);
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -21358,7 +21426,7 @@ function isnan (val) {
   return val !== val // eslint-disable-line no-self-compare
 }
 
-},{"base64-js":29,"ieee754":25}],33:[function(require,module,exports){
+},{"base64-js":30,"ieee754":26}],34:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -21401,7 +21469,7 @@ function isnan (val) {
   }
 });
 
-},{"../../lib/codemirror":38}],34:[function(require,module,exports){
+},{"../../lib/codemirror":39}],35:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -21465,7 +21533,7 @@ function isnan (val) {
   }
 });
 
-},{"../../lib/codemirror":38}],35:[function(require,module,exports){
+},{"../../lib/codemirror":39}],36:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -21518,7 +21586,7 @@ function isnan (val) {
   };
 });
 
-},{"../../lib/codemirror":38}],36:[function(require,module,exports){
+},{"../../lib/codemirror":39}],37:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -21610,7 +21678,7 @@ CodeMirror.overlayMode = function(base, overlay, combine) {
 
 });
 
-},{"../../lib/codemirror":38}],37:[function(require,module,exports){
+},{"../../lib/codemirror":39}],38:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -21730,7 +21798,7 @@ CodeMirror.overlayMode = function(base, overlay, combine) {
   }
 });
 
-},{"../../lib/codemirror":38}],38:[function(require,module,exports){
+},{"../../lib/codemirror":39}],39:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -30962,7 +31030,7 @@ CodeMirror.version = "5.24.2"
 return CodeMirror;
 
 })));
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -31094,7 +31162,7 @@ CodeMirror.defineMode("gfm", function(config, modeConfig) {
   CodeMirror.defineMIME("text/x-gfm", "gfm");
 });
 
-},{"../../addon/mode/overlay":36,"../../lib/codemirror":38,"../markdown/markdown":40}],40:[function(require,module,exports){
+},{"../../addon/mode/overlay":37,"../../lib/codemirror":39,"../markdown/markdown":41}],41:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -31912,7 +31980,7 @@ CodeMirror.defineMIME("text/x-markdown", "markdown");
 
 });
 
-},{"../../lib/codemirror":38,"../meta":41,"../xml/xml":42}],41:[function(require,module,exports){
+},{"../../lib/codemirror":39,"../meta":42,"../xml/xml":43}],42:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -32126,7 +32194,7 @@ CodeMirror.defineMIME("text/x-markdown", "markdown");
   };
 });
 
-},{"../lib/codemirror":38}],42:[function(require,module,exports){
+},{"../lib/codemirror":39}],43:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -32522,4 +32590,4 @@ if (!CodeMirror.mimeModes.hasOwnProperty("text/html"))
 
 });
 
-},{"../../lib/codemirror":38}]},{},[13]);
+},{"../../lib/codemirror":39}]},{},[14]);
