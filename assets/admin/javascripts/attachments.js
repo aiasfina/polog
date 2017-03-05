@@ -1,6 +1,6 @@
 var m = require('mithril');
 var UploaderComponent = require('./components/uploader.jsx');
-var AttachmentList = require('./components/attachment_list.jsx');
+var Attachments = require('./components/attachments.jsx');
 
 window.initUploader = function() {
   var el = document.getElementById('uploader');
@@ -8,7 +8,7 @@ window.initUploader = function() {
     view: function() {
       return [
         m(UploaderComponent),
-        m(AttachmentList)
+        m(Attachments)
       ]
     }
   });

@@ -4,7 +4,7 @@ var utils = require('../utils.js');
 var MarkdownComponent = require('./markdown.jsx');
 var ModalComponent = require('./modal.jsx');
 var UploaderComponent = require('./uploader.jsx');
-var AttachmentList = require('./attachment_list.jsx');
+var AttachmentList = require('./attachments.jsx');
 require('bootstrap-tagsinput/dist/bootstrap-tagsinput.js');
 
 var Form = {

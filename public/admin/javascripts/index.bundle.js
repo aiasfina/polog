@@ -14,18 +14,18 @@ window.initAccountIndex = function () {
 
 var m = require('mithril');
 var UploaderComponent = require('./components/uploader.jsx');
-var AttachmentList = require('./components/attachment_list.jsx');
+var Attachments = require('./components/attachments.jsx');
 
 window.initUploader = function () {
   var el = document.getElementById('uploader');
   m.mount(el, {
     view: function view() {
-      return [m(UploaderComponent), m(AttachmentList)];
+      return [m(UploaderComponent), m(Attachments)];
     }
   });
 };
 
-},{"./components/attachment_list.jsx":6,"./components/uploader.jsx":14,"mithril":24}],3:[function(require,module,exports){
+},{"./components/attachments.jsx":6,"./components/uploader.jsx":14,"mithril":24}],3:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -253,6 +253,7 @@ module.exports = {
 var m = require('mithril');
 var Attachment = require('../models/attachment.js');
 var utils = require('../utils.js');
+var PaginationComponent = require('./pagination.jsx');
 
 var ItemComponent = {
   itemCover: function itemCover(attachment) {
@@ -293,8 +294,8 @@ var ItemComponent = {
   }
 };
 
-var Component = {
-  oninit: Attachment.loadList,
+var ListComponent = {
+  oninit: Attachment.loadList(1),
   view: function view() {
     return m(
       'ul',
@@ -306,9 +307,13 @@ var Component = {
   }
 };
 
-module.exports = Component;
+module.exports = {
+  view: function view() {
+    return [m(ListComponent), m(PaginationComponent, { pagination: Attachment.pagination, loadList: Attachment.loadList })];
+  }
+};
 
-},{"../models/attachment.js":17,"../utils.js":21,"mithril":24}],7:[function(require,module,exports){
+},{"../models/attachment.js":17,"../utils.js":21,"./pagination.jsx":10,"mithril":24}],7:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -472,7 +477,7 @@ var utils = require('../utils.js');
 var MarkdownComponent = require('./markdown.jsx');
 var ModalComponent = require('./modal.jsx');
 var UploaderComponent = require('./uploader.jsx');
-var AttachmentList = require('./attachment_list.jsx');
+var AttachmentList = require('./attachments.jsx');
 require('bootstrap-tagsinput/dist/bootstrap-tagsinput.js');
 
 var Form = {
@@ -652,7 +657,7 @@ var PostEditorComponent = {
 
 module.exports = PostEditorComponent;
 
-},{"../models/post.js":19,"../utils.js":21,"./attachment_list.jsx":6,"./markdown.jsx":8,"./modal.jsx":9,"./uploader.jsx":14,"bootstrap-tagsinput/dist/bootstrap-tagsinput.js":23,"mithril":24}],12:[function(require,module,exports){
+},{"../models/post.js":19,"../utils.js":21,"./attachments.jsx":6,"./markdown.jsx":8,"./modal.jsx":9,"./uploader.jsx":14,"bootstrap-tagsinput/dist/bootstrap-tagsinput.js":23,"mithril":24}],12:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -956,15 +961,31 @@ module.exports = Account;
 var m = require('mithril');
 var utils = require('../utils.js');
 
+function updatePagination(resp) {
+  Attachment.pagination.current_page = resp.current_page;
+  Attachment.pagination.is_first_page = resp.is_first_page;
+  Attachment.pagination.is_last_page = resp.is_last_page;
+}
+
 var Attachment = {
   list: [],
-  loadList: function loadList() {
-    m.request({
-      method: 'GET',
-      url: '/admin/attachments.json'
-    }).then(function (resp) {
-      Attachment.list = resp.data;
-    });
+  pagination: {
+    current_page: 0,
+    is_first_page: false,
+    is_last_page: false
+  },
+  loadList: function loadList(page) {
+    page = page || 1;
+    return function () {
+      m.request({
+        method: 'GET',
+        url: '/admin/attachments.json',
+        data: { page: page }
+      }).then(function (resp) {
+        Attachment.list = resp.data;
+        updatePagination(resp);
+      });
+    };
   }
 };
 

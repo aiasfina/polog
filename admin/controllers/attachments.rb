@@ -3,7 +3,7 @@ Polog::Admin.controllers :attachments do
     case content_type
       when :html then render 'attachments/index'
       when :json then
-        @attachments = Attachment.order(id: :desc).page(params[:page]).per(params[:per])
+        @attachments = Attachment.order(id: :desc).page(params[:page]).per(params[:per] || 16)
         jj_collection @attachments, Attachment.collection_json_attributes
     end
   end
