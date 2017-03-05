@@ -12,7 +12,8 @@ var babelify = require('babelify');
 
 gulp.task('browserify', function() {
   var entries = [
-    'admin/javascripts/index.jsx'
+    'admin/javascripts/index.jsx',
+    'app/javascripts/index.js'
   ];
 
   var tasks = entries.map(function(entry) {
@@ -33,6 +34,10 @@ gulp.task('sass', function() {
     {
       file: 'admin/stylesheets/index.scss',
       dest: 'admin/stylesheets'
+    },
+    {
+      file: 'app/stylesheets/index.scss',
+      dest: 'app/stylesheets'
     }
   ];
 

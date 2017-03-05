@@ -2,12 +2,12 @@
 
 module Polog
   class App
-    module HomeHelper
+    module BlogHelper
       # def simple_helper_method
       # ...
       # end
     end
 
-    helpers HomeHelper
+    helpers BlogHelper
   end
 end
