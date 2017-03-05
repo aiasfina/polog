@@ -17,19 +17,17 @@ var Form = {
 var TagInputComponent = {
   max: 5,
   $el: null,
-  oncreate: function(vnode) {
-    if (vnode.tag == 'input') {
-      var $el = TagInputComponent.$el = $(vnode.dom);
-      $el.tagsinput({maxTags: TagInputComponent.max});
-      $el
-        .on('itemAdded', function(event) {
-          Form.tags.push(event.item);
-        })
-        .on('itemRemoved', function(event) {
-          var index = Form.tags.indexOf(event.item);
-          Form.tags.splice(index, 1);
-        });
-    }
+  oncreateTagInput: function(vnode) {
+    var $el = TagInputComponent.$el = $(vnode.dom);
+    $el.tagsinput({maxTags: TagInputComponent.max});
+    $el
+      .on('itemAdded', function(event) {
+        Form.tags.push(event.item);
+      })
+      .on('itemRemoved', function(event) {
+        var index = Form.tags.indexOf(event.item);
+        Form.tags.splice(index, 1);
+      });
   },
   guid: function() {
     this._guid = this._guid || utils.guid();
@@ -40,7 +38,7 @@ var TagInputComponent = {
       <div className="form-group">
         <label htmlFor={this.guid()} className="control-label">{vnode.attrs.label}</label>
         <input className="form-control" data-role="tagsinput" type="text" id={this.guid()}
-          placeholder={vnode.attrs.placeholder} oncreate={TagInputComponent.oncreate} value={Form.tags.join(',')} />
+          placeholder={vnode.attrs.placeholder} oncreate={TagInputComponent.oncreateTagInput} value={Form.tags.join(',')} />
       </div>
     )
   }

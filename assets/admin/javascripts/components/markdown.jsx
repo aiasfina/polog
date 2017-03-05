@@ -4,13 +4,11 @@ var SimpleMDE = require('simplemde/src/js/simplemde.js');
 
 var MarkdownComponent = {
   simplemde: null,
-  oncreate: function(vnode) {
-    if (vnode.tag == 'textarea') {
-      MarkdownComponent.simplemde = new SimpleMDE({
-        element: vnode.dom,
-        autoDownloadFontAwesome: false
-      });
-    }
+  oncreateTextarea: function(vnode) {
+    MarkdownComponent.simplemde = new SimpleMDE({
+      element: vnode.dom,
+      autoDownloadFontAwesome: false
+    });
   },
   getContent: function() {
     return this.simplemde.value();
@@ -21,7 +19,7 @@ var MarkdownComponent = {
   view: function(vnode) {
     return(
       <div className="simplemde-wrapper">
-        <textarea oncreate={MarkdownComponent.oncreate}></textarea>
+        <textarea oncreate={MarkdownComponent.oncreateTextarea}></textarea>
       </div>
     )
   }
