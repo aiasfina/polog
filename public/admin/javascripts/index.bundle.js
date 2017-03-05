@@ -318,7 +318,7 @@ var Comment = require('../models/comment.js');
 
 var HeaderList = ['Id', '文章标题', '用户名', '删除'];
 
-var Attributes = ['id', 'post_id', 'account_name', function (index) {
+var Attributes = ['id', 'post_title', 'account_name', function (index) {
   return m(
     'a',
     { href: 'javascript:void(0);', className: 'btn btn-danger btn-xs', onclick: destroy(this, index) },

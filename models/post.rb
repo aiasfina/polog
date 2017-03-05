@@ -1,6 +1,6 @@
 class Post < ActiveRecord::Base
   belongs_to :account
-  has_many :comments
+  has_many :comments, dependent: :destroy
 
   def markdown_convert
     Kramdown::Document.new(content).to_html

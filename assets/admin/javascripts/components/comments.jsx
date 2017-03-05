@@ -12,7 +12,7 @@ var HeaderList = [
 
 var Attributes = [
   'id',
-  'post_id',
+  'post_title',
   'account_name',
   function(index) {
     return <a href="javascript:void(0);" className="btn btn-danger btn-xs" onclick={destroy(this, index)}><i className="fa fa-times"></i></a>
