@@ -415,9 +415,11 @@ var Attributes = ['id', 'post_id', 'account_name', function (index) {
 
 function destroy(comment, index) {
   return function () {
-    Comment.destroy(comment).then(function () {
-      Comment.list.splice(index, 1);
-    });
+    if (confirm('是否删除？') === true) {
+      Comment.destroy(comment).then(function () {
+        Comment.list.splice(index, 1);
+      });
+    }
   };
 }
 
