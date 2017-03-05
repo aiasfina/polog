@@ -1,6 +1,12 @@
 var m = require('mithril');
 var utils = require('../utils.js');
 
+function updatePagination(resp) {
+  Comment.pagination.current_page = resp.current_page;
+  Comment.pagination.is_first_page = resp.is_first_page;
+  Comment.pagination.is_last_page = resp.is_last_page;
+}
+
 var Comment = {
   list: [],
   pagination: {
@@ -18,9 +24,7 @@ var Comment = {
       })
       .then(function(resp) {
         Comment.list = resp.data;
-        Comment.pagination.current_page = resp.current_page;
-        Comment.pagination.is_first_page = resp.is_first_page;
-        Comment.pagination.is_last_page = resp.is_last_page;
+        updatePagination(resp);
       })
     }
   },

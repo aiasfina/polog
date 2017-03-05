@@ -23,17 +23,33 @@ var validations = {
   }
 }
 
+function updatePagination(resp) {
+  Account.pagination.current_page = resp.current_page;
+  Account.pagination.is_first_page = resp.is_first_page;
+  Account.pagination.is_last_page = resp.is_last_page;
+}
+
 var Account = {
   list: [],
-  loadList: function() {
-    m.request({
-      method: 'GET',
-      url: '/admin/accounts.json',
-      withCredentials: true
-    })
-    .then(function(resp) {
-      Account.list = resp.data;
-    })
+  pagination: {
+    current_page: 0,
+    is_first_page: false,
+    is_last_page: false
+  },
+  loadList: function(page) {
+    page = page || 1;
+    return function() {
+      m.request({
+        method: 'GET',
+        url: '/admin/accounts.json',
+        data: {page: page},
+        withCredentials: true
+      })
+      .then(function(resp) {
+        Account.list = resp.data;
+        updatePagination(resp);
+      })
+    }
   },
   create: function(form) {
     return m.request({

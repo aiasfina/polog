@@ -2,14 +2,14 @@
 'use strict';
 
 var m = require('mithril');
-var tableComponent = require('./components/account_table.jsx');
+var AccountsComponent = require('./components/accounts.jsx');
 
 window.initAccountIndex = function () {
   var el = document.querySelectorAll('.table-wrapper')[0];
-  m.mount(el, tableComponent);
+  m.mount(el, AccountsComponent);
 };
 
-},{"./components/account_table.jsx":4,"mithril":23}],2:[function(require,module,exports){
+},{"./components/accounts.jsx":5,"mithril":24}],2:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -25,7 +25,7 @@ window.initUploader = function () {
   });
 };
 
-},{"./components/attachment_list.jsx":5,"./components/uploader.jsx":13,"mithril":23}],3:[function(require,module,exports){
+},{"./components/attachment_list.jsx":6,"./components/uploader.jsx":14,"mithril":24}],3:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -36,12 +36,165 @@ window.initCommentIndex = function () {
   m.mount(el, CommentsComponent);
 };
 
-},{"./components/comments.jsx":6,"mithril":23}],4:[function(require,module,exports){
+},{"./components/comments.jsx":7,"mithril":24}],4:[function(require,module,exports){
+'use strict';
+
+var m = require('mithril');
+var Account = require('../models/account.js');
+
+var Form = {
+  name: '',
+  surname: '',
+  password: '',
+  password_confirmation: '',
+  email: '',
+  role: ''
+};
+
+var Error = {};
+
+var FormComponent = {
+  updateForm: function updateForm(name) {
+    return function (value) {
+      Form[name] = value;
+    };
+  },
+  reset: function reset() {
+    for (var key in Form) {
+      if (Form.hasOwnProperty(key)) {
+        Form[key] = '';
+      }
+    }
+
+    for (var key in Error) {
+      if (Error.hasOwnProperty(key)) {
+        Error[key] = '';
+      }
+    }
+  },
+  submit: function submit(e) {
+    if (Account.valid(Form, Error)) {
+      (FormComponent.isEdit() ? Account.update(Form) : Account.create(Form)).then(function () {
+        $('#accountModal').modal('hide');
+        FormComponent.reset();
+      });
+    }
+  },
+  isEdit: function isEdit() {
+    return !!Form.id;
+  },
+  errorClassName: function errorClassName(name) {
+    return Error[name] ? ' has-error' : '';
+  },
+  errorMessage: function errorMessage(name) {
+    if (Error[name]) {
+      return m(
+        'p',
+        { 'class': 'text-danger text-right' },
+        Error[name]
+      );
+    }
+  },
+  view: function view() {
+    return m(
+      'form',
+      null,
+      m(
+        'div',
+        { className: "form-group" + this.errorClassName('name') },
+        m(
+          'label',
+          { className: 'control-label', htmlFor: 'account_name' },
+          '\u7528\u6237\u540D'
+        ),
+        m('input', { id: 'account_name', type: 'text', className: 'form-control', value: Form.name, oninput: m.withAttr('value', this.updateForm('name')) })
+      ),
+      m(
+        'div',
+        { className: "form-group" + this.errorClassName('surname') },
+        m(
+          'label',
+          { className: 'control-label', htmlFor: 'account_surname' },
+          '\u522B\u540D'
+        ),
+        m('input', { id: 'account_surname', type: 'text', className: 'form-control', value: Form.surname, oninput: m.withAttr('value', this.updateForm('surname')) })
+      ),
+      m(
+        'div',
+        { className: "form-group" + this.errorClassName('email') },
+        m(
+          'label',
+          { className: 'control-label', htmlFor: 'account_email' },
+          '\u90AE\u7BB1'
+        ),
+        m('input', { id: 'account_email', type: 'text', className: 'form-control', disabled: this.isEdit(),
+          value: Form.email, oninput: m.withAttr('value', this.updateForm('email')) }),
+        this.errorMessage('email')
+      ),
+      m(
+        'div',
+        { className: "form-group" + this.errorClassName('password') },
+        m(
+          'label',
+          { className: 'control-label', htmlFor: 'account_password' },
+          '\u5BC6\u7801'
+        ),
+        m('input', { id: 'account_password', type: 'password', className: 'form-control', disabled: this.isEdit(),
+          value: Form.password, oninput: m.withAttr('value', this.updateForm('password')) }),
+        this.errorMessage('password')
+      ),
+      m(
+        'div',
+        { className: "form-group" + this.errorClassName('password_confirmation') },
+        m(
+          'label',
+          { className: 'control-label', htmlFor: 'account_password_confirmation' },
+          '\u786E\u8BA4\u5BC6\u7801'
+        ),
+        m('input', { id: 'account_password_confirmation', type: 'password', className: 'form-control', disabled: this.isEdit(),
+          value: Form.password_confirmation, oninput: m.withAttr('value', this.updateForm('password_confirmation')) }),
+        this.errorMessage('password_confirmation')
+      ),
+      m(
+        'div',
+        { className: "form-group" + this.errorClassName('role') },
+        m(
+          'label',
+          { className: 'control-label', htmlFor: 'account_role' },
+          '\u89D2\u8272'
+        ),
+        m('input', { id: 'account_role', type: 'text', className: 'form-control', value: Form.role, oninput: m.withAttr('value', this.updateForm('role')) }),
+        this.errorMessage('role')
+      ),
+      m(
+        'div',
+        { className: 'form-group clearfix' },
+        m(
+          'button',
+          { type: 'button', 'class': 'btn btn-default', 'data-dismiss': 'modal' },
+          '\u5173\u95ED'
+        ),
+        m(
+          'button',
+          { type: 'button', 'class': 'btn btn-primary pull-right', onclick: this.submit.bind(this) },
+          '\u4FDD\u5B58'
+        )
+      )
+    );
+  }
+};
+
+module.exports = FormComponent;
+
+},{"../models/account.js":16,"mithril":24}],5:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
 var Account = require('../models/account.js');
 var ModalComponent = require('./modal.jsx');
+var FormComponent = require('./account_form.jsx');
+var TableComponent = require('./table.jsx');
+var PaginationComponent = require('./pagination.jsx');
 
 var FilterComponent = {
   newAccount: function newAccount() {
@@ -67,274 +220,34 @@ var FilterComponent = {
   }
 };
 
-var TableComponent = {
-  oninit: Account.loadList,
-  checkedAll: false,
-  selectAllAccount: function selectAllAccount(checked) {
-    this.checkedAll = checked;
-    if (checked) {
-      Account.list.forEach(function (account) {
-        Account.selectedObject[account.id] = account;
-      });
-    } else {
-      Account.selectedObject = {};
-    }
-  },
-  selectAccount: function selectAccount() {
-    Account.selectedObject[this.id] = Account.selectedObject[this.id] ? null : this;
-  },
-  edit: function edit(account) {
-    return function () {
-      FormComponent.reset();
-      ['id', 'name', 'surname', 'email', 'role'].forEach(function (name) {
-        FormComponent.form[name] = account[name];
-      });
-      $('#accountModal').modal();
-    };
-  },
-  renderRowView: function renderRowView(account) {
-    return m(
-      'tr',
-      { className: Account.selectedObject[account.id] ? 'active' : '',
-        onclick: this.selectAccount.bind(account) },
-      m(
-        'td',
-        null,
-        m('input', { type: 'checkbox', checked: !!Account.selectedObject[account.id] })
-      ),
-      m(
-        'td',
-        null,
-        account.id
-      ),
-      m(
-        'td',
-        null,
-        account.name
-      ),
-      m(
-        'td',
-        null,
-        account.email
-      ),
-      m(
-        'td',
-        null,
-        account.role
-      ),
-      m(
-        'td',
-        null,
-        m(
-          'a',
-          { href: 'javascript:void(0);', onclick: this.edit(account) },
-          m('i', { className: 'fa fa-edit' })
-        )
-      )
-    );
-  },
-  view: function view() {
-    return m(
-      'table',
-      { 'class': 'table' },
-      m(
-        'thead',
-        null,
-        m(
-          'tr',
-          null,
-          m(
-            'th',
-            null,
-            m('input', { type: 'checkbox', onclick: m.withAttr('checked', this.selectAllAccount.bind(this)),
-              checked: this.checkedAll })
-          ),
-          m(
-            'th',
-            null,
-            'id'
-          ),
-          m(
-            'th',
-            null,
-            '\u7528\u6237\u540D'
-          ),
-          m(
-            'th',
-            null,
-            '\u90AE\u7BB1'
-          ),
-          m(
-            'th',
-            null,
-            '\u89D2\u8272'
-          ),
-          m(
-            'th',
-            null,
-            '#'
-          )
-        )
-      ),
-      m(
-        'tbody',
-        null,
-        Account.list.map(function (account) {
-          return TableComponent.renderRowView(account);
-        })
-      )
-    );
-  }
-};
+var HeaderList = ['Id', '用户名', '别名', '邮箱', '角色', '编辑'];
 
-var FormComponent = {
-  form: {
-    name: '',
-    surname: '',
-    password: '',
-    password_confirmation: '',
-    email: '',
-    role: ''
-  },
-  errors: {},
-  updateForm: function updateForm(name) {
-    var form = this.form;
-    return function (value) {
-      form[name] = value;
-    };
-  },
-  reset: function reset() {
-    for (var key in this.form) {
-      if (this.form.hasOwnProperty(key)) {
-        this.form[key] = '';
-      }
-    }
+var Attributes = ['id', 'name', 'surname', 'email', 'role', function () {
+  return m(
+    'a',
+    { href: 'javascript:void(0);', className: 'btn btn-primary btn-xs', onclick: edit(this) },
+    m('i', { className: 'fa fa-pencil' })
+  );
+}];
 
-    for (var key in this.errors) {
-      if (this.errors.hasOwnProperty(key)) {
-        this.errors[key] = '';
-      }
-    }
-  },
-  submit: function submit(e) {
-    if (Account.valid(this.form, this.errors)) {
-      (FormComponent.isEdit() ? Account.update(this.form) : Account.create(this.form)).then(function () {
-        $('#accountModal').modal('hide');
-        FormComponent.reset();
-      });
-    }
-  },
-  isEdit: function isEdit() {
-    return !!FormComponent.form.id;
-  },
-  errorClassName: function errorClassName(name) {
-    return FormComponent.errors[name] ? ' has-error' : '';
-  },
-  errorMessage: function errorMessage(name) {
-    if (FormComponent.errors[name]) {
-      return m(
-        'p',
-        { 'class': 'text-danger text-right' },
-        FormComponent.errors[name]
-      );
-    }
-  },
-  view: function view() {
-    return m(
-      'form',
-      null,
-      m(
-        'div',
-        { className: "form-group" + this.errorClassName('name') },
-        m(
-          'label',
-          { className: 'control-label', htmlFor: 'account_name' },
-          '\u7528\u6237\u540D'
-        ),
-        m('input', { id: 'account_name', type: 'text', className: 'form-control', value: this.form.name, oninput: m.withAttr('value', this.updateForm('name')) })
-      ),
-      m(
-        'div',
-        { className: "form-group" + this.errorClassName('surname') },
-        m(
-          'label',
-          { className: 'control-label', htmlFor: 'account_surname' },
-          '\u522B\u540D'
-        ),
-        m('input', { id: 'account_surname', type: 'text', className: 'form-control', value: this.form.surname, oninput: m.withAttr('value', this.updateForm('surname')) })
-      ),
-      m(
-        'div',
-        { className: "form-group" + this.errorClassName('email') },
-        m(
-          'label',
-          { className: 'control-label', htmlFor: 'account_email' },
-          '\u90AE\u7BB1'
-        ),
-        m('input', { id: 'account_email', type: 'text', className: 'form-control', disabled: this.isEdit(),
-          value: this.form.email, oninput: m.withAttr('value', this.updateForm('email')) }),
-        this.errorMessage('email')
-      ),
-      m(
-        'div',
-        { className: "form-group" + this.errorClassName('password') },
-        m(
-          'label',
-          { className: 'control-label', htmlFor: 'account_password' },
-          '\u5BC6\u7801'
-        ),
-        m('input', { id: 'account_password', type: 'password', className: 'form-control', disabled: this.isEdit(),
-          value: this.form.password, oninput: m.withAttr('value', this.updateForm('password')) }),
-        this.errorMessage('password')
-      ),
-      m(
-        'div',
-        { className: "form-group" + this.errorClassName('password_confirmation') },
-        m(
-          'label',
-          { className: 'control-label', htmlFor: 'account_password_confirmation' },
-          '\u786E\u8BA4\u5BC6\u7801'
-        ),
-        m('input', { id: 'account_password_confirmation', type: 'password', className: 'form-control', disabled: this.isEdit(),
-          value: this.form.password_confirmation, oninput: m.withAttr('value', this.updateForm('password_confirmation')) }),
-        this.errorMessage('password_confirmation')
-      ),
-      m(
-        'div',
-        { className: "form-group" + this.errorClassName('role') },
-        m(
-          'label',
-          { className: 'control-label', htmlFor: 'account_role' },
-          '\u89D2\u8272'
-        ),
-        m('input', { id: 'account_role', type: 'text', className: 'form-control', value: this.form.role, oninput: m.withAttr('value', this.updateForm('role')) }),
-        this.errorMessage('role')
-      ),
-      m(
-        'div',
-        { className: 'form-group clearfix' },
-        m(
-          'button',
-          { type: 'button', 'class': 'btn btn-default', 'data-dismiss': 'modal' },
-          '\u5173\u95ED'
-        ),
-        m(
-          'button',
-          { type: 'button', 'class': 'btn btn-primary pull-right', onclick: this.submit.bind(this) },
-          '\u4FDD\u5B58'
-        )
-      )
-    );
-  }
-};
+function edit(account) {
+  return function () {
+    FormComponent.reset();
+    ['id', 'name', 'surname', 'email', 'role'].forEach(function (name) {
+      FormComponent.updateForm(name)(account[name]);
+    });
+    $('#accountModal').modal();
+  };
+}
 
 module.exports = {
+  oninit: Account.loadList(1),
   view: function view() {
-    return [m(FilterComponent), m(TableComponent), m(ModalComponent, { id: 'accountModal' }, m(FormComponent))];
+    return [m(FilterComponent), m(TableComponent, { headerList: HeaderList, attributes: Attributes, list: Account.list }), m(PaginationComponent, { pagination: Account.pagination, loadList: Account.loadList }), m(ModalComponent, { id: 'accountModal' }, m(FormComponent))];
   }
 };
 
-},{"../models/account.js":15,"./modal.jsx":8,"mithril":23}],5:[function(require,module,exports){
+},{"../models/account.js":16,"./account_form.jsx":4,"./modal.jsx":9,"./pagination.jsx":10,"./table.jsx":13,"mithril":24}],6:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -395,7 +308,7 @@ var Component = {
 
 module.exports = Component;
 
-},{"../models/attachment.js":16,"../utils.js":20,"mithril":23}],6:[function(require,module,exports){
+},{"../models/attachment.js":17,"../utils.js":21,"mithril":24}],7:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -435,7 +348,7 @@ module.exports = {
   }
 };
 
-},{"../models/comment.js":17,"./pagination.jsx":9,"./table.jsx":12,"mithril":23}],7:[function(require,module,exports){
+},{"../models/comment.js":18,"./pagination.jsx":10,"./table.jsx":13,"mithril":24}],8:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -469,7 +382,7 @@ var MarkdownComponent = {
 
 module.exports = MarkdownComponent;
 
-},{"../utils.js":20,"mithril":23,"simplemde/src/js/simplemde.js":29}],8:[function(require,module,exports){
+},{"../utils.js":21,"mithril":24,"simplemde/src/js/simplemde.js":30}],9:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -500,7 +413,7 @@ var ModalComponent = {
 
 module.exports = ModalComponent;
 
-},{"mithril":23}],9:[function(require,module,exports){
+},{"mithril":24}],10:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -550,7 +463,7 @@ module.exports = {
   }
 };
 
-},{"mithril":23}],10:[function(require,module,exports){
+},{"mithril":24}],11:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -739,140 +652,55 @@ var PostEditorComponent = {
 
 module.exports = PostEditorComponent;
 
-},{"../models/post.js":18,"../utils.js":20,"./attachment_list.jsx":5,"./markdown.jsx":7,"./modal.jsx":8,"./uploader.jsx":13,"bootstrap-tagsinput/dist/bootstrap-tagsinput.js":22,"mithril":23}],11:[function(require,module,exports){
+},{"../models/post.js":19,"../utils.js":21,"./attachment_list.jsx":6,"./markdown.jsx":8,"./modal.jsx":9,"./uploader.jsx":14,"bootstrap-tagsinput/dist/bootstrap-tagsinput.js":23,"mithril":24}],12:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
 var Post = require('../models/post.js');
+var TableComponent = require('./table.jsx');
+var PaginationComponent = require('./pagination.jsx');
 
-var TableComponent = {
-  oninit: Post.loadList,
-  checkedAll: false,
-  selectAll: function selectAll(checked) {
-    this.checkedAll = checked;
-    if (checked) {
-      Post.list.forEach(function (post) {
-        Post.selectedObject[post.id] = post;
+var HeaderList = ['标题', '发布', '发布时间', '编辑', '删除'];
+
+var Attributes = ['title', function () {
+  return m('input', { type: 'checkbox', onclick: m.withAttr('checked', publish.bind(this)), checked: this.published });
+}, 'published_at', function () {
+  return m(
+    'a',
+    { href: '/admin/posts/edit/' + this.id, className: 'btn btn-primary btn-xs' },
+    m('i', { className: 'fa fa-edit' })
+  );
+}, function (index) {
+  return m(
+    'a',
+    { href: 'javascript:void(0);', className: 'btn btn-danger btn-xs', onclick: destroy(this, index) },
+    m('i', { className: 'fa fa-times' })
+  );
+}];
+
+function publish(checked) {
+  this.published = checked;
+  Post.publish(this);
+}
+
+function destroy(post, index) {
+  return function () {
+    if (confirm('是否删除？') === true) {
+      Post.destroy(post).then(function () {
+        Post.list.splice(index, 1);
       });
-    } else {
-      Post.selectedObject = {};
     }
-  },
-  select: function select() {
-    Post.selectedObject[this.id] = Post.selectedObject[this.id] ? null : this;
-  },
-  publish: function publish(checked) {
-    this.published = checked;
-    Post.publish(this);
-  },
-  destroy: function destroy(post, index) {
-    return function () {
-      if (confirm('是否删除？') === true) {
-        Post.destroy(post).then(function () {
-          Post.list.splice(index, 1);
-        });
-      }
-    };
-  },
-  renderRowView: function renderRowView(post, index) {
-    return m(
-      'tr',
-      { className: Post.selectedObject[post.id] ? 'active' : '',
-        onclick: this.select.bind(post) },
-      m(
-        'td',
-        null,
-        m('input', { type: 'checkbox', checked: !!Post.selectedObject[post.id] })
-      ),
-      m(
-        'td',
-        null,
-        post.title
-      ),
-      m(
-        'td',
-        null,
-        m('input', { type: 'checkbox', onclick: m.withAttr('checked', TableComponent.publish.bind(post)), checked: post.published })
-      ),
-      m(
-        'td',
-        null,
-        post.published_at
-      ),
-      m(
-        'td',
-        null,
-        m(
-          'a',
-          { href: '/admin/posts/edit/' + post.id, className: 'btn btn-primary btn-xs' },
-          m('i', { className: 'fa fa-edit' }),
-          ' \u7F16\u8F91'
-        ),
-        m(
-          'a',
-          { href: 'javascript:void(0);', className: 'btn btn-danger btn-xs', onclick: TableComponent.destroy(post, index) },
-          m('i', { className: 'fa fa-times' }),
-          ' \u5220\u9664'
-        )
-      )
-    );
-  },
-  view: function view() {
-    return m(
-      'table',
-      { 'class': 'table' },
-      m(
-        'thead',
-        null,
-        m(
-          'tr',
-          null,
-          m(
-            'th',
-            null,
-            m('input', { type: 'checkbox', onclick: m.withAttr('checked', this.selectAll.bind(this)),
-              checked: this.checkedAll })
-          ),
-          m(
-            'th',
-            null,
-            '\u6807\u9898'
-          ),
-          m(
-            'th',
-            null,
-            '\u53D1\u5E03'
-          ),
-          m(
-            'th',
-            null,
-            '\u53D1\u5E03\u65F6\u95F4'
-          ),
-          m(
-            'th',
-            null,
-            '#'
-          )
-        )
-      ),
-      m(
-        'tbody',
-        null,
-        Post.list.map(function (post, index) {
-          return TableComponent.renderRowView(post, index);
-        })
-      )
-    );
-  }
-};
+  };
+}
 
 module.exports = {
+  oninit: Post.loadList(1),
   view: function view() {
-    return [m(TableComponent)];
+    return [m(TableComponent, { headerList: HeaderList, attributes: Attributes, list: Post.list }), m(PaginationComponent, { pagination: Post.pagination, loadList: Post.loadList })];
   }
 };
 
-},{"../models/post.js":18,"mithril":23}],12:[function(require,module,exports){
+},{"../models/post.js":19,"./pagination.jsx":10,"./table.jsx":13,"mithril":24}],13:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -954,7 +782,7 @@ module.exports = {
   }
 };
 
-},{"mithril":23}],13:[function(require,module,exports){
+},{"mithril":24}],14:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -990,7 +818,7 @@ var Component = {
 
 module.exports = Component;
 
-},{"../models/attachment.js":16,"../utils.js":20,"dropzone":32,"mithril":23}],14:[function(require,module,exports){
+},{"../models/attachment.js":17,"../utils.js":21,"dropzone":33,"mithril":24}],15:[function(require,module,exports){
 'use strict';
 
 window.jQuery = window.$ = require('jquery');
@@ -1000,7 +828,7 @@ require('./posts.js');
 require('./attachments.js');
 require('./comments.js');
 
-},{"./accounts.js":1,"./attachments.js":2,"./comments.js":3,"./posts.js":19,"jquery":31}],15:[function(require,module,exports){
+},{"./accounts.js":1,"./attachments.js":2,"./comments.js":3,"./posts.js":20,"jquery":32}],16:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -1044,16 +872,32 @@ var validations = {
   }
 };
 
+function updatePagination(resp) {
+  Account.pagination.current_page = resp.current_page;
+  Account.pagination.is_first_page = resp.is_first_page;
+  Account.pagination.is_last_page = resp.is_last_page;
+}
+
 var Account = {
   list: [],
-  loadList: function loadList() {
-    m.request({
-      method: 'GET',
-      url: '/admin/accounts.json',
-      withCredentials: true
-    }).then(function (resp) {
-      Account.list = resp.data;
-    });
+  pagination: {
+    current_page: 0,
+    is_first_page: false,
+    is_last_page: false
+  },
+  loadList: function loadList(page) {
+    page = page || 1;
+    return function () {
+      m.request({
+        method: 'GET',
+        url: '/admin/accounts.json',
+        data: { page: page },
+        withCredentials: true
+      }).then(function (resp) {
+        Account.list = resp.data;
+        updatePagination(resp);
+      });
+    };
   },
   create: function create(form) {
     return m.request({
@@ -1106,7 +950,7 @@ var Account = {
 
 module.exports = Account;
 
-},{"../utils.js":20,"mithril":23}],16:[function(require,module,exports){
+},{"../utils.js":21,"mithril":24}],17:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
@@ -1126,11 +970,17 @@ var Attachment = {
 
 module.exports = Attachment;
 
-},{"../utils.js":20,"mithril":23}],17:[function(require,module,exports){
+},{"../utils.js":21,"mithril":24}],18:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
 var utils = require('../utils.js');
+
+function updatePagination(resp) {
+  Comment.pagination.current_page = resp.current_page;
+  Comment.pagination.is_first_page = resp.is_first_page;
+  Comment.pagination.is_last_page = resp.is_last_page;
+}
 
 var Comment = {
   list: [],
@@ -1148,9 +998,7 @@ var Comment = {
         data: { page: page }
       }).then(function (resp) {
         Comment.list = resp.data;
-        Comment.pagination.current_page = resp.current_page;
-        Comment.pagination.is_first_page = resp.is_first_page;
-        Comment.pagination.is_last_page = resp.is_last_page;
+        updatePagination(resp);
       });
     };
   },
@@ -1165,22 +1013,38 @@ var Comment = {
 
 module.exports = Comment;
 
-},{"../utils.js":20,"mithril":23}],18:[function(require,module,exports){
+},{"../utils.js":21,"mithril":24}],19:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
 var utils = require('../utils.js');
 
+function updatePagination(resp) {
+  Post.pagination.current_page = resp.current_page;
+  Post.pagination.is_first_page = resp.is_first_page;
+  Post.pagination.is_last_page = resp.is_last_page;
+}
+
 var Post = {
   list: [],
-  loadList: function loadList() {
-    m.request({
-      method: 'GET',
-      url: '/admin/posts.json',
-      withCredentials: true
-    }).then(function (resp) {
-      Post.list = resp.data;
-    });
+  pagination: {
+    current_page: 0,
+    is_first_page: false,
+    is_last_page: false
+  },
+  loadList: function loadList(page) {
+    page = page || 1;
+    return function () {
+      m.request({
+        method: 'GET',
+        url: '/admin/posts.json',
+        data: { page: page },
+        withCredentials: true
+      }).then(function (resp) {
+        Post.list = resp.data;
+        updatePagination(resp);
+      });
+    };
   },
   load: function load(id) {
     return m.request({
@@ -1231,16 +1095,16 @@ var Post = {
 
 module.exports = Post;
 
-},{"../utils.js":20,"mithril":23}],19:[function(require,module,exports){
+},{"../utils.js":21,"mithril":24}],20:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
-var tableComponent = require('./components/post_table.jsx');
+var PostsComponent = require('./components/posts.jsx');
 var EditorComponent = require('./components/post_editor.jsx');
 
 window.initPostIndex = function () {
   var el = document.querySelectorAll('.table-wrapper')[0];
-  m.mount(el, tableComponent);
+  m.mount(el, PostsComponent);
 };
 
 window.initPostEditor = function () {
@@ -1248,7 +1112,7 @@ window.initPostEditor = function () {
   m.mount(el, EditorComponent);
 };
 
-},{"./components/post_editor.jsx":10,"./components/post_table.jsx":11,"mithril":23}],20:[function(require,module,exports){
+},{"./components/post_editor.jsx":11,"./components/posts.jsx":12,"mithril":24}],21:[function(require,module,exports){
 "use strict";
 
 var $ = require('jquery');
@@ -1275,7 +1139,7 @@ utils.guid = function () {
 
 module.exports = utils;
 
-},{"jquery":31}],21:[function(require,module,exports){
+},{"jquery":32}],22:[function(require,module,exports){
 (function (global){
 /**
  * marked - a markdown parser
@@ -2565,7 +2429,7 @@ if (typeof module !== 'undefined' && typeof exports === 'object') {
 }());
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 (function ($) {
   "use strict";
 
@@ -3230,7 +3094,7 @@ if (typeof module !== 'undefined' && typeof exports === 'object') {
   });
 })(window.jQuery);
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 (function (global){
 new function() {
 
@@ -4396,7 +4260,7 @@ if (typeof module !== "undefined") module["exports"] = m
 else window.m = m
 }
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 (function (Buffer,__dirname){
 /* globals chrome: false */
 /* globals __dirname: false */
@@ -5330,7 +5194,7 @@ if (typeof module !== 'undefined') {
 	module.exports = Typo;
 }
 }).call(this,require("buffer").Buffer,"/node_modules/.1.1.2@codemirror-spell-checker/node_modules/typo-js")
-},{"buffer":33,"fs":27}],25:[function(require,module,exports){
+},{"buffer":34,"fs":28}],26:[function(require,module,exports){
 // Use strict mode (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode)
 "use strict";
 
@@ -5450,7 +5314,7 @@ CodeMirrorSpellChecker.typo;
 
 // Export
 module.exports = CodeMirrorSpellChecker;
-},{"typo-js":24}],26:[function(require,module,exports){
+},{"typo-js":25}],27:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -5536,9 +5400,9 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],27:[function(require,module,exports){
-
 },{}],28:[function(require,module,exports){
+
+},{}],29:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -5584,7 +5448,7 @@ CodeMirror.commands.shiftTabAndUnindentMarkdownList = function (cm) {
 	}
 };
 
-},{"codemirror":39}],29:[function(require,module,exports){
+},{"codemirror":40}],30:[function(require,module,exports){
 /*global require,module*/
 "use strict";
 var CodeMirror = require("codemirror");
@@ -7613,7 +7477,7 @@ SimpleMDE.prototype.toTextArea = function() {
 };
 
 module.exports = SimpleMDE;
-},{"./codemirror/tablist":28,"codemirror":39,"codemirror-spell-checker":25,"codemirror/addon/display/fullscreen.js":34,"codemirror/addon/display/placeholder.js":35,"codemirror/addon/edit/continuelist.js":36,"codemirror/addon/mode/overlay.js":37,"codemirror/addon/selection/mark-selection.js":38,"codemirror/mode/gfm/gfm.js":40,"codemirror/mode/markdown/markdown.js":41,"codemirror/mode/xml/xml.js":43,"marked":21}],30:[function(require,module,exports){
+},{"./codemirror/tablist":29,"codemirror":40,"codemirror-spell-checker":26,"codemirror/addon/display/fullscreen.js":35,"codemirror/addon/display/placeholder.js":36,"codemirror/addon/edit/continuelist.js":37,"codemirror/addon/mode/overlay.js":38,"codemirror/addon/selection/mark-selection.js":39,"codemirror/mode/gfm/gfm.js":41,"codemirror/mode/markdown/markdown.js":42,"codemirror/mode/xml/xml.js":44,"marked":22}],31:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -7729,7 +7593,7 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.1.1
  * https://jquery.com/
@@ -17951,7 +17815,7 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 
 /*
  *
@@ -19720,7 +19584,7 @@ return jQuery;
 
 }).call(this);
 
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -21428,7 +21292,7 @@ function isnan (val) {
   return val !== val // eslint-disable-line no-self-compare
 }
 
-},{"base64-js":30,"ieee754":26}],34:[function(require,module,exports){
+},{"base64-js":31,"ieee754":27}],35:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -21471,7 +21335,7 @@ function isnan (val) {
   }
 });
 
-},{"../../lib/codemirror":39}],35:[function(require,module,exports){
+},{"../../lib/codemirror":40}],36:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -21535,7 +21399,7 @@ function isnan (val) {
   }
 });
 
-},{"../../lib/codemirror":39}],36:[function(require,module,exports){
+},{"../../lib/codemirror":40}],37:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -21588,7 +21452,7 @@ function isnan (val) {
   };
 });
 
-},{"../../lib/codemirror":39}],37:[function(require,module,exports){
+},{"../../lib/codemirror":40}],38:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -21680,7 +21544,7 @@ CodeMirror.overlayMode = function(base, overlay, combine) {
 
 });
 
-},{"../../lib/codemirror":39}],38:[function(require,module,exports){
+},{"../../lib/codemirror":40}],39:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -21800,7 +21664,7 @@ CodeMirror.overlayMode = function(base, overlay, combine) {
   }
 });
 
-},{"../../lib/codemirror":39}],39:[function(require,module,exports){
+},{"../../lib/codemirror":40}],40:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -31032,7 +30896,7 @@ CodeMirror.version = "5.24.2"
 return CodeMirror;
 
 })));
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -31164,7 +31028,7 @@ CodeMirror.defineMode("gfm", function(config, modeConfig) {
   CodeMirror.defineMIME("text/x-gfm", "gfm");
 });
 
-},{"../../addon/mode/overlay":37,"../../lib/codemirror":39,"../markdown/markdown":41}],41:[function(require,module,exports){
+},{"../../addon/mode/overlay":38,"../../lib/codemirror":40,"../markdown/markdown":42}],42:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -31982,7 +31846,7 @@ CodeMirror.defineMIME("text/x-markdown", "markdown");
 
 });
 
-},{"../../lib/codemirror":39,"../meta":42,"../xml/xml":43}],42:[function(require,module,exports){
+},{"../../lib/codemirror":40,"../meta":43,"../xml/xml":44}],43:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -32196,7 +32060,7 @@ CodeMirror.defineMIME("text/x-markdown", "markdown");
   };
 });
 
-},{"../lib/codemirror":39}],43:[function(require,module,exports){
+},{"../lib/codemirror":40}],44:[function(require,module,exports){
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -32592,4 +32456,4 @@ if (!CodeMirror.mimeModes.hasOwnProperty("text/html"))
 
 });
 
-},{"../../lib/codemirror":39}]},{},[14]);
+},{"../../lib/codemirror":40}]},{},[15]);

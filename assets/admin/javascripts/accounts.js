@@ -1,7 +1,7 @@
 var m = require('mithril');
-var tableComponent = require('./components/account_table.jsx');
+var AccountsComponent = require('./components/accounts.jsx');
 
 window.initAccountIndex = function() {
   var el = document.querySelectorAll('.table-wrapper')[0];
-  m.mount(el, tableComponent);
+  m.mount(el, AccountsComponent);
 }

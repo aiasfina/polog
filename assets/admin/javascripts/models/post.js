@@ -1,17 +1,33 @@
 var m = require('mithril');
 var utils = require('../utils.js');
 
+function updatePagination(resp) {
+  Post.pagination.current_page = resp.current_page;
+  Post.pagination.is_first_page = resp.is_first_page;
+  Post.pagination.is_last_page = resp.is_last_page;
+}
+
 var Post = {
   list: [],
-  loadList: function () {
-    m.request({
-      method: 'GET',
-      url: '/admin/posts.json',
-      withCredentials: true
-    })
-    .then(function(resp) {
-      Post.list = resp.data;
-    })
+  pagination: {
+    current_page: 0,
+    is_first_page: false,
+    is_last_page: false
+  },
+  loadList: function (page) {
+    page = page || 1;
+    return function() {
+      m.request({
+        method: 'GET',
+        url: '/admin/posts.json',
+        data: {page: page},
+        withCredentials: true
+      })
+      .then(function(resp) {
+        Post.list = resp.data;
+        updatePagination(resp);
+      })
+    }
   },
   load: function(id) {
     return m.request({
