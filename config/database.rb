@@ -16,9 +16,9 @@
 ActiveRecord::Base.configurations[:development] = {
   :adapter   => 'postgresql',
   :database  => 'polog_development',
-  :username  => 'postgres',
-  :password  => '',
-  :host      => '192.168.99.100',
+  :username  => ENV['DB_USERNAME'],
+  :password  => ENV['DB_PASSWORD'],
+  :host      => ENV['DB_HOST'],
   :port      => 5432
 
 }
@@ -26,9 +26,9 @@ ActiveRecord::Base.configurations[:development] = {
 ActiveRecord::Base.configurations[:production] = {
   :adapter   => 'postgresql',
   :database  => 'polog_production',
-  :username  => 'root',
-  :password  => '',
-  :host      => 'localhost',
+  :username  => ENV['DB_USERNAME'],
+  :password  => ENV['DB_PASSWORD'],
+  :host      => ENV['DB_HOST'],
   :port      => 5432
 
 }
@@ -36,9 +36,9 @@ ActiveRecord::Base.configurations[:production] = {
 ActiveRecord::Base.configurations[:test] = {
   :adapter   => 'postgresql',
   :database  => 'polog_test',
-  :username  => 'postgres',
-  :password  => '',
-  :host      => '192.168.99.100',
+  :username  => ENV['DB_USERNAME'],
+  :password  => ENV['DB_PASSWORD'],
+  :host      => ENV['DB_HOST'],
   :port      => 5432
 
 }

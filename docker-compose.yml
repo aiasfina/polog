@@ -1,0 +1,21 @@
+app:
+  build: .
+  ports:
+    - 8080
+  links:
+    - db:db
+db:
+  image: postgres
+  volumes_from:
+    - db_data
+db_data:
+  image: busybox
+  volumes:
+    - /var/lib/postgresql/data
+web:
+  build: .
+  dockerfile: Dockerfile-nginx
+  links:
+    - app
+  ports:
+    - 80:80

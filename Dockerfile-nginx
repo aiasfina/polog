@@ -1,0 +1,13 @@
+FROM nginx
+
+RUN apt-get update -qq && apt-get -y install apache2-utils
+
+ENV RAILS_ROOT /var/project/polog/
+
+WORKDIR $RAILS_ROOT
+
+ADD public public/
+
+ADD nginx.conf /etc/nginx/nginx.conf
+
+CMD [ "nginx", "-g", "daemon off;" ]
